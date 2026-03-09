@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pimentón OS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E8402A; --rl:#F2604A; --rd:#C42E1A;
+  --cream:#FBF7F2; --sand:#F0E9DF; --sand2:#E0D5C8;
+  --ink:#1A1410; --inkl:#7A6558; --inkf:#B8A99A;
+  --green:#2D9E6B; --gbg:#E8F5EE;
+  --amber:#D4860A; --abg:#FDF3E0;
+  --danger:#C42E1A; --dbg:#FDE8E5;
+  --blue:#2D6ECC; --bbg:#E8F0FA;
+  --white:#fff; --sw:216px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);height:100vh;overflow:hidden;}
+#app{display:none;width:100%;height:100vh;overflow:hidden;flex-direction:row;}
+
+/* ── SIDEBAR ── */
+.sb{width:var(--sw);background:var(--ink);height:100vh;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.sb-logo{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:9px;}
+.sb-icon{width:30px;height:30px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sb-name{font-family:'DM Serif Display',serif;font-size:16px;color:#fff;}
+.sb-tag{font-size:9px;color:rgba(255,255,255,.28);letter-spacing:1.2px;text-transform:uppercase;margin-top:1px;}
+.sb-nav{flex:1;overflow-y:auto;padding:6px 7px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent;}
+.sb-sec{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.2);padding:10px 8px 3px;}
+.sb-a{display:flex;align-items:center;gap:7px;padding:6.5px 8px;border-radius:6px;cursor:pointer;color:rgba(255,255,255,.44);font-size:12px;margin-bottom:1px;transition:all .12s;user-select:none;}
+.sb-a:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);}
+.sb-a.on{background:var(--red);color:#fff;font-weight:600;}
+.sb-emoji{font-size:12px;width:16px;text-align:center;flex-shrink:0;}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:9px;}
+.sb-a.on .sb-badge{background:rgba(255,255,255,.25);}
+.sb-role{font-size:8px;padding:1px 5px;border-radius:3px;margin-left:auto;background:rgba(255,255,255,.08);color:rgba(255,255,255,.28);font-weight:700;letter-spacing:.3px;}
+.sb-user{padding:10px 12px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:8px;}
+.sb-av{width:26px;height:26px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-un{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.75);}
+.sb-ur{font-size:9.5px;color:rgba(255,255,255,.24);}
+
+/* ── MAIN ── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid var(--sand2);padding:0 20px;height:49px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tb-l{display:flex;align-items:center;gap:10px;}
+.tb-title{font-family:'DM Serif Display',serif;font-size:17px;}
+.tb-chip{font-size:10.5px;color:var(--inkf);background:var(--sand);padding:2px 8px;border-radius:20px;}
+.tb-r{display:flex;align-items:center;gap:7px;}
+.bp{background:var(--red);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:11.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px;transition:background .13s;}
+.bp:hover{background:var(--rl);}
+.bg{background:transparent;border:1px solid var(--sand2);color:var(--inkl);padding:4px 11px;border-radius:7px;font-size:11.5px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .12s;}
+.bg:hover{border-color:var(--red);color:var(--red);}
+.bb{background:var(--blue);color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:11.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .13s;}
+.bb:hover{background:#3D7EDD;}
+
+/* ── PAGES ── */
+.page{flex:1;overflow-y:auto;display:none;padding:18px 20px 40px;}
+.page.on{display:block;}
+.page::-webkit-scrollbar{width:4px;}
+.page::-webkit-scrollbar-thumb{background:var(--sand2);border-radius:4px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.met-tab{padding:4px 10px;background:var(--sand);border:1px solid var(--sand2);border-radius:5px;font-size:10px;cursor:pointer;color:var(--inkl);font-family:'DM Sans',sans-serif;}
+.met-tab.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:600;}
+.met-kpi-card{background:var(--cream);border-radius:8px;padding:12px;position:relative;overflow:hidden;}
+.met-kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--sand2);}
+.met-kpi-card.good::before{background:var(--green);}
+.met-kpi-card.warn::before{background:var(--amber);}
+.met-kpi-card.alert::before{background:var(--danger);}
+.rp-gen{padding:16px;}.rp-gen-sec{margin-bottom:14px;border-bottom:1px solid var(--sand);padding-bottom:14px;}
+.rp-gen-sec:last-child{border-bottom:none;}
+.rp-gen-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--inkf);margin-bottom:8px;}
+.rp-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px;}
+.rp-stat-mini{background:var(--cream);border-radius:7px;padding:9px;text-align:center;}
+.rp-stat-mini .l{font-size:8px;text-transform:uppercase;letter-spacing:.5px;color:var(--inkf);margin-bottom:2px;}
+.rp-stat-mini .v{font-family:'DM Serif Display',serif;font-size:18px;}
+.wa-gen{background:#111;border-radius:12px;padding:12px 16px;font-family:monospace;font-size:11.5px;color:#E8F5E9;white-space:pre-wrap;line-height:1.7;max-height:280px;overflow-y:auto;}
+.diag-card{background:#fff;border:1px solid var(--sand2);border-radius:10px;margin-bottom:11px;overflow:hidden;}
+.diag-card-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--sand);}
+.diag-score-bar{height:6px;width:100px;background:var(--sand);border-radius:3px;overflow:hidden;}
+.diag-score-fill{height:100%;border-radius:3px;}
+.diag-card-body{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 14px;}
+.diag-item{padding:8px 10px;border-radius:6px;font-size:11px;}
+.diag-item.ok{background:var(--gbg);color:#1A6B42;}
+.diag-item.bad{background:var(--dbg);color:var(--danger);}
+.diag-item.warn{background:var(--abg);color:#8B5A0A;}
+.diag-item.rec{background:var(--bbg);color:var(--blue);grid-column:1/-1;font-weight:600;}
+
+/* ── SHARED COMPONENTS ── */
+.card{background:#fff;border:1px solid var(--sand2);border-radius:10px;}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--sand);}
+.card-title{font-family:'DM Serif Display',serif;font-size:14px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
+.sec-title{font-family:'DM Serif Display',serif;font-size:15px;}
+.sec-sub{font-size:11px;color:var(--inkf);margin-top:1px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.g2r{display:grid;grid-template-columns:1fr 280px;gap:15px;align-items:start;}
+.g2r2{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start;}
+.stat{background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:13px 15px;cursor:default;transition:all .16s;}
+.stat:hover{border-color:var(--red);transform:translateY(-1px);box-shadow:0 3px 10px rgba(232,64,42,.09);}
+.stat-l{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--inkf);margin-bottom:4px;}
+.stat-v{font-family:'DM Serif Display',serif;font-size:25px;line-height:1;margin-bottom:3px;}
+.stat-d{font-size:11px;}
+.up{color:var(--green);}
+.dn{color:var(--danger);}
+.nt{color:var(--inkf);}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%;}
+.pg{background:var(--gbg);color:var(--green);}.pg::before{background:var(--green);}
+.pa{background:var(--abg);color:var(--amber);}.pa::before{background:var(--amber);}
+.pr{background:var(--dbg);color:var(--danger);}.pr::before{background:var(--danger);}
+.pb{background:var(--bbg);color:var(--blue);}.pb::before{background:var(--blue);}
+
+/* ── TABLE ── */
+.tbl{background:#fff;border:1px solid var(--sand2);border-radius:10px;overflow:hidden;}
+.tf{padding:8px 12px;border-bottom:1px solid var(--sand);display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.fc{padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:500;cursor:pointer;border:1px solid var(--sand2);color:var(--inkl);background:transparent;font-family:'DM Sans',sans-serif;transition:all .11s;}
+.fc.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+.fc:not(.on):hover{border-color:var(--red);color:var(--red);}
+.si{margin-left:auto;border:1px solid var(--sand2);border-radius:6px;padding:4px 8px 4px 22px;font-size:11px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--sand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23B8A99A' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 6px center no-repeat;width:140px;outline:none;}
+.si:focus{border-color:var(--red);background-color:#fff;}
+.th-row{display:grid;padding:6px 12px;background:var(--sand);border-bottom:1px solid var(--sand2);}
+.th{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--inkf);}
+.tr{display:grid;padding:9px 12px;border-bottom:1px solid var(--sand);align-items:center;cursor:pointer;transition:background .1s;}
+.tr:last-child{border-bottom:none;}
+.tr:hover{background:var(--cream);}
+.av{width:27px;height:27px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:#fff;flex-shrink:0;}
+.cn{font-size:12px;font-weight:600;}
+.cs{font-size:10px;color:var(--inkf);}
+.cv{font-size:11.5px;font-weight:500;}
+.cols7{grid-template-columns:2fr 82px 68px 68px 68px 58px 80px;}
+
+/* ── TASKS ── */
+.ti{padding:9px 12px;border-bottom:1px solid var(--sand);cursor:pointer;transition:background .1s;display:flex;gap:8px;align-items:flex-start;}
+.ti:last-child{border-bottom:none;}
+.ti:hover{background:var(--cream);}
+.tc{width:13px;height:13px;border:1.5px solid var(--sand2);border-radius:3px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;transition:all .12s;}
+.tc:hover{border-color:var(--red);}
+.tc.done{background:var(--green);border-color:var(--green);color:#fff;}
+.tn{font-size:12px;font-weight:500;line-height:1.3;}
+.tn.done{text-decoration:line-through;color:var(--inkf);}
+.tm{display:flex;align-items:center;gap:4px;margin-top:2px;}
+.tt{font-size:9.5px;background:var(--sand);color:var(--inkl);padding:1px 5px;border-radius:3px;}
+.td{font-size:9.5px;color:var(--inkf);}
+.td.hot{color:var(--amber);font-weight:600;}
+.td.late{color:var(--danger);font-weight:600;}
+.pt{font-size:9.5px;font-weight:700;padding:1px 5px;border-radius:3px;flex-shrink:0;}
+.ph{background:var(--dbg);color:var(--danger);}
+.pm{background:var(--abg);color:var(--amber);}
+.pl{background:var(--gbg);color:var(--green);}
+.add-row{display:flex;gap:5px;padding:9px 12px;border-top:1px solid var(--sand);background:var(--cream);}
+.add-i{flex:1;border:1px solid var(--sand2);border-radius:6px;padding:5px 8px;font-size:11.5px;font-family:'DM Sans',sans-serif;color:var(--ink);background:#fff;outline:none;}
+.add-i:focus{border-color:var(--red);}
+
+/* ── ALERTS ── */
+.ai{padding:9px 12px;border-bottom:1px solid var(--sand);display:flex;gap:8px;align-items:flex-start;cursor:pointer;transition:background .1s;}
+.ai:last-child{border-bottom:none;}
+.ai:hover{background:var(--cream);}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.ar{background:var(--danger);}
+.aa{background:var(--amber);}
+.ag{background:var(--green);}
+.at{font-size:12px;font-weight:600;line-height:1.3;}
+.ad{font-size:11px;color:var(--inkl);margin-top:1px;}
+.atm{font-size:10px;color:var(--inkf);margin-top:1px;}
+
+/* ── BARS / CHARTS ── */
+.bars{display:flex;align-items:flex-end;gap:4px;}
+.bar{flex:1;border-radius:3px 3px 0 0;position:relative;cursor:default;transition:opacity .12s;}
+.bar:hover{opacity:.8;}
+.bar .bv{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:8.5px;font-weight:600;white-space:nowrap;color:var(--ink);}
+.bar .bl{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--inkf);white-space:nowrap;}
+.hbar-wrap{margin-bottom:6px;}
+.hbar-label{display:flex;align-items:center;justify-content:space-between;font-size:11px;margin-bottom:3px;}
+.hbar-track{height:8px;background:var(--sand);border-radius:4px;overflow:hidden;}
+.hbar-fill{height:100%;border-radius:4px;transition:width .4s;}
+
+/* ── REPORT CONFIG ── */
+.rc{background:#fff;border:1px solid var(--sand2);border-radius:11px;overflow:hidden;position:sticky;top:0;}
+.rc-hdr{background:var(--ink);padding:13px 15px;}
+.rc-title{font-family:'DM Serif Display',serif;font-size:15px;color:#fff;}
+.rc-sub{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:2px;}
+.rc-body{padding:13px 15px;}
+.rc-sec{margin-bottom:14px;}
+.rc-label{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--inkf);margin-bottom:6px;}
+.tgl-g{display:flex;flex-wrap:wrap;gap:4px;}
+.tgl{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1.5px solid var(--sand2);color:var(--inkl);background:transparent;font-family:'DM Sans',sans-serif;transition:all .12s;}
+.tgl.on{background:var(--red);color:#fff;border-color:var(--red);}
+.tgl:not(.on):hover{border-color:var(--red);color:var(--red);}
+.fsel{width:100%;border:1px solid var(--sand2);border-radius:7px;padding:5px 8px;font-size:11.5px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--cream);outline:none;margin-bottom:7px;}
+.fsel:focus{border-color:var(--red);}
+.erow{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--cream);border-radius:6px;border:1px solid var(--sand2);margin-bottom:4px;}
+.elabel{font-size:11px;color:var(--ink);}
+.esl{-webkit-appearance:none;width:60px;height:3px;border-radius:2px;background:var(--sand2);outline:none;cursor:pointer;}
+.esl::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--red);cursor:pointer;}
+.rc-foot{padding:11px 15px;border-top:1px solid var(--sand);display:flex;gap:6px;}
+
+/* ── REPORT PREVIEW ── */
+.rp{background:#fff;border:1px solid var(--sand2);border-radius:11px;overflow:hidden;}
+.rp-hdr{background:var(--red);padding:12px 17px;display:flex;align-items:center;justify-content:space-between;}
+.rp-title{font-family:'DM Serif Display',serif;font-size:16px;color:#fff;}
+.rp-meta{font-size:10.5px;color:rgba(255,255,255,.6);}
+.rp-body{padding:16px;}
+.rp-sec{margin-bottom:18px;}
+.rp-sec-title{font-size:9.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--inkf);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--sand);}
+.rt{width:100%;border-collapse:collapse;font-size:11.5px;}
+.rt th{background:var(--ink);color:#fff;padding:6px 9px;text-align:left;font-size:10px;letter-spacing:.3px;}
+.rt td{padding:7px 9px;border-bottom:1px solid var(--sand);}
+.rt tr:last-child td{border-bottom:none;}
+.rt tr:nth-child(even) td{background:var(--cream);}
+.ru{color:var(--green);font-weight:700;}
+.rd2{color:var(--danger);font-weight:700;}
+.ae{background:var(--cream);border:1px solid var(--sand2);border-radius:7px;padding:11px;font-size:12px;color:var(--ink);line-height:1.65;outline:none;min-height:100px;font-family:'DM Sans',sans-serif;width:100%;}
+.ae:focus{border-color:var(--red);}
+.ns-list{list-style:none;}
+.ns-list li{display:flex;align-items:flex-start;gap:6px;padding:5px 0;border-bottom:1px solid var(--sand);font-size:12px;}
+.ns-list li:last-child{border-bottom:none;}
+.ns-list li::before{content:'→';color:var(--red);font-weight:700;flex-shrink:0;}
+.wa-wrap{background:#e5ddd5;border-radius:9px;padding:13px;}
+.wa-bubble{background:#fff;border-radius:0 8px 8px 8px;padding:10px 12px;max-width:90%;box-shadow:0 1px 2px rgba(0,0,0,.1);font-size:11.5px;line-height:1.6;color:#111;white-space:pre-wrap;}
+.wa-time{text-align:right;font-size:9px;color:#aaa;margin-top:3px;}
+
+/* ── PIPELINE ── */
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;}
+.pipe-col{background:var(--sand);border-radius:9px;padding:11px;}
+.pipe-col-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--inkl);margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;}
+.pipe-count{font-size:9.5px;background:#fff;color:var(--inkl);padding:1px 6px;border-radius:9px;font-weight:700;}
+.pipe-card{background:#fff;border:1px solid var(--sand2);border-radius:7px;padding:10px;margin-bottom:7px;cursor:pointer;transition:all .12s;}
+.pipe-card:hover{border-color:var(--red);transform:translateY(-1px);}
+.pipe-cn{font-size:12px;font-weight:700;margin-bottom:1px;}
+.pipe-cm{font-size:10.5px;color:var(--inkf);margin-bottom:6px;}
+.pipe-val{font-size:12.5px;font-weight:700;color:var(--green);}
+
+/* ── ONBOARDING ── */
+.onb{background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:13px;margin-bottom:10px;}
+.onb-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.onb-name{font-size:13px;font-weight:700;}
+.onb-prog{height:5px;background:var(--sand);border-radius:3px;overflow:hidden;margin-bottom:7px;}
+.onb-bar{height:100%;border-radius:3px;background:var(--green);}
+.onb-steps{display:flex;gap:4px;flex-wrap:wrap;}
+.onb-step{font-size:9.5px;padding:2px 7px;border-radius:20px;font-weight:500;}
+.os-done{background:var(--gbg);color:var(--green);}
+.os-act{background:var(--bbg);color:var(--blue);}
+.os-todo{background:var(--sand);color:var(--inkf);}
+
+/* ── DIAG ── */
+.diag{background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:13px;margin-bottom:10px;}
+.diag-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.diag-name{font-size:13px;font-weight:700;}
+.diag-score{font-family:'DM Serif Display',serif;font-size:20px;}
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.ditem{padding:7px 10px;border-radius:6px;font-size:11.5px;line-height:1.4;}
+.dok{background:var(--gbg);border:1px solid #C3E8D5;color:#1A6640;}
+.dwarn{background:var(--abg);border:1px solid #F0CC88;color:#7A4A00;}
+.dbad{background:var(--dbg);border:1px solid #F5C5BC;color:#7A1A10;}
+.drec{background:var(--bbg);border:1px solid #C3D8F5;color:#1A3A7A;}
+
+/* ── TEAM ── */
+.team-g{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.team-c{background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:14px;}
+.team-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;margin-bottom:8px;}
+.team-name{font-size:13px;font-weight:700;}
+.team-role{font-size:11px;color:var(--inkf);margin-bottom:7px;}
+.team-stats{display:flex;gap:12px;padding-top:7px;border-top:1px solid var(--sand);}
+.ts-l{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf);}
+.ts-v{font-size:14px;font-weight:700;}
+
+/* ── ACADEMIA ── */
+.ac-g{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.ac-c{background:#fff;border:1px solid var(--sand2);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .16s;}
+.ac-c:hover{border-color:var(--red);transform:translateY(-2px);box-shadow:0 3px 10px rgba(232,64,42,.09);}
+.ac-banner{height:68px;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.ac-body{padding:12px;}
+.ac-t{font-size:12.5px;font-weight:700;margin-bottom:3px;}
+.ac-s{font-size:11px;color:var(--inkf);}
+.ac-tag{display:inline-block;margin-top:6px;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;}
+
+/* ── FINANZAS TABLE ── */
+.fin-t{width:100%;border-collapse:collapse;font-size:12px;}
+.fin-t th{background:var(--ink);color:#fff;padding:7px 11px;text-align:left;font-size:10px;}
+.fin-t td{padding:8px 11px;border-bottom:1px solid var(--sand);}
+.fin-t tr:nth-child(even) td{background:var(--cream);}
+.fin-t tr:last-child td{border-bottom:none;}
+
+/* ── WORLD CARDS ── */
+.world-g{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px;}
+.world-c{background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:13px;}
+.wflag{font-size:24px;margin-bottom:4px;}
+.wname{font-size:12px;font-weight:700;}
+.wcm{font-size:10px;color:var(--inkf);margin-bottom:8px;}
+.wstats{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.ws{background:var(--cream);border-radius:5px;padding:6px;text-align:center;}
+.ws-l{font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf);margin-bottom:1px;}
+.ws-v{font-size:14px;font-weight:700;}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;}
+.login-box{background:#fff;border-radius:16px;padding:40px 44px;width:380px;box-shadow:0 24px 60px rgba(0,0,0,.35);}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+.login-icon{width:38px;height:38px;background:var(--red);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.login-brand{font-family:'DM Serif Display',serif;font-size:22px;color:var(--ink);}
+.login-tag{font-size:10px;color:var(--inkf);letter-spacing:1.2px;text-transform:uppercase;margin-top:1px;}
+.login-title{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:5px;}
+.login-sub{font-size:12.5px;color:var(--inkl);margin-bottom:26px;}
+.login-label{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--inkl);margin-bottom:6px;}
+.login-input{width:100%;border:1.5px solid var(--sand2);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;margin-bottom:14px;transition:border-color .13s;}
+.login-input:focus{border-color:var(--red);}
+.login-btn{width:100%;background:var(--red);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:4px;transition:background .13s;}
+.login-btn:hover{background:var(--rl);}
+.login-err{font-size:12px;color:var(--danger);text-align:center;margin-top:10px;min-height:18px;}
+.login-hint{margin-top:20px;padding-top:16px;border-top:1px solid var(--sand);font-size:10.5px;color:var(--inkf);}
+.login-hint strong{color:var(--inkl);}
+#app{display:none;width:100%;height:100vh;}
+#app.visible{display:flex;}
+</style>
+
+</head>
+<body style="margin:0;padding:0;overflow:hidden;height:100vh;background:var(--cream);">
+
+<!-- ══ LOGIN ══ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-icon">🌶️</div>
+      <div><div class="login-brand">Pimentón</div><div class="login-tag">Operations OS</div></div>
+    </div>
+    <div class="login-title">Bienvenido de vuelta</div>
+    <div class="login-sub">Ingresá con tu cuenta del equipo</div>
+    <div class="login-label">Email</div>
+    <input class="login-input" id="li-email" type="email" placeholder="tu@pimenton.io" >
+    <div class="login-label">Contraseña</div>
+    <input class="login-input" id="li-pass" type="password" placeholder="••••••••" >
+    <button class="login-btn" id="login-btn">Entrar →</button>
+    <div class="login-err" id="li-err"></div>
+    <div class="login-hint">
+      <strong>Usuarios demo:</strong><br>
+      <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8be0eefde2e5cbfbe2e6eee5ffe4e5a5e2e4">[email&#160;protected]</a> · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5d3b2f3c333e321d2d34303833293233733432">[email&#160;protected]</a><br>
+      <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a2c6c3cccbc7cee2d2cbcfc7ccd6cdcc8ccbcd">[email&#160;protected]</a> · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="86e8e7e5eee9c6f6efebe3e8f2e9e8a8efe9">[email&#160;protected]</a><br>
+      Contraseña: <strong>pimenton2026</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app" style="display:none;width:100%;height:100vh;overflow:hidden;">
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-icon">🌶️</div>
+    <div><div class="sb-name">Pimentón</div><div class="sb-tag">Operations OS</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-sec">Principal</div>
+    <div class="sb-a on" onclick="go(this,'dashboard')"><span class="sb-emoji">⊞</span>Mi Dashboard</div>
+    <div class="sb-a" onclick="go(this,'clientes')"><span class="sb-emoji">👥</span>Mis Clientes<span class="sb-badge">24</span></div>
+    <div class="sb-a" onclick="go(this,'tareas')"><span class="sb-emoji">✓</span>Mis Tareas<span class="sb-badge">8</span></div>
+    <div class="sb-a" onclick="go(this,'alertas')"><span class="sb-emoji">🔔</span>Alertas<span class="sb-badge">3</span></div>
+    <div class="sb-sec">Reportes</div>
+    <div class="sb-a" onclick="go(this,'rep-semanal')"><span class="sb-emoji">📄</span>Reporte Semanal</div>
+    <div class="sb-a" onclick="go(this,'rep-ops')"><span class="sb-emoji">📋</span>Reporte Operaciones</div>
+    <div class="sb-a" onclick="go(this,'rep-mensual')"><span class="sb-emoji">📊</span>Reporte Mensual</div>
+    <div class="sb-sec">Análisis</div>
+    <div class="sb-a" onclick="go(this,'metricas')"><span class="sb-emoji">📈</span>Métricas</div>
+    <div class="sb-a" onclick="go(this,'diagnostico')"><span class="sb-emoji">⚡</span>Diagnóstico</div>
+    <div class="sb-a" onclick="go(this,'campanas')"><span class="sb-emoji">🎯</span>Campañas</div>
+    <div class="sb-a" onclick="go(this,'onboarding')"><span class="sb-emoji">🚀</span>Onboarding</div>
+    <div class="sb-sec">Pimentón Global</div>
+    <div class="sb-a" onclick="go(this,'country')"><span class="sb-emoji">🗺️</span>Vista Country Manager<span class="sb-role">CM</span></div>
+    <div class="sb-a" onclick="go(this,'founders')"><span class="sb-emoji">🌎</span>Vista Founders<span class="sb-role">FOUNDER</span></div>
+    <div class="sb-a" onclick="go(this,'equipo')"><span class="sb-emoji">🏢</span>Equipo</div>
+    <div class="sb-a" onclick="go(this,'ventas')"><span class="sb-emoji">💼</span>Ventas / CRM</div>
+    <div class="sb-a" onclick="go(this,'finanzas')"><span class="sb-emoji">💰</span>Finanzas<span class="sb-role">ADMIN</span></div>
+    <div class="sb-a" onclick="go(this,'academia')"><span class="sb-emoji">🎓</span>Academia</div>
+  </nav>
+  <div class="sb-user">
+    <div class="sb-av">KO</div>
+    <div><div class="sb-un">Kevin Ostrovsky</div><div class="sb-ur">Country Manager · USA</div></div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <div class="tb-title" id="tbTitle">Mi Dashboard</div>
+      <div class="tb-chip" id="tbChip">Semana 10 · Marzo 2026</div>
+    </div>
+    <div class="tb-r">
+      <button class="bg" id="tbG" style="display:none"></button>
+      <button class="bp" id="tbP">+ Nueva tarea</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       DASHBOARD
+  ══════════════════════════════════════════════ -->
+  <div class="page on" id="p-dashboard">
+    <div style="background:linear-gradient(135deg,#FDE8E5,#FDF3E0);border:1px solid #F5C5BC;border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer;">
+      <span style="font-size:16px">⚠️</span>
+      <div style="flex:1;font-size:12px"><strong style="color:var(--red)">3 alertas activas</strong> · Doral −18.8% ventas · Cancelaciones Negroni 4.8% · NPS Paperfish bajó a 4.4</div>
+      <span style="font-size:10px;background:var(--dbg);color:var(--danger);padding:2px 7px;border-radius:4px;font-weight:700">2 críticas</span>
+      <span style="font-size:10px;background:var(--abg);color:var(--amber);padding:2px 7px;border-radius:4px;font-weight:700">1 atención</span>
+    </div>
+    <div class="g4">
+      <div class="stat"><div class="stat-l">Clientes activos</div><div class="stat-v">24</div><div class="stat-d nt">↔ igual que mes pasado</div></div>
+      <div class="stat"><div class="stat-l">Venta bruta</div><div class="stat-v">$312K</div><div class="stat-d up">↑ 8.4% vs mes anterior</div></div>
+      <div class="stat"><div class="stat-l">Tareas pendientes</div><div class="stat-v">8</div><div class="stat-d dn">3 vencen hoy</div></div>
+      <div class="stat"><div class="stat-l">Clientes en riesgo</div><div class="stat-v" style="color:var(--danger)">3</div><div class="stat-d dn">↑ 1 nuevo esta semana</div></div>
+    </div>
+    <div class="g2r">
+      <div>
+        <div class="sec-hdr"><div><div class="sec-title">Mi cartera</div><div class="sec-sub">Top 6 por prioridad</div></div><button class="bg" onclick="go(document.querySelector('[onclick*=clientes]'),'clientes')" style="font-size:11px">Ver todos</button></div>
+        <div class="tbl">
+          <div class="th-row cols7"><div class="th">Cliente</div><div class="th">Estado</div><div class="th">NPS</div><div class="th">Conv.</div><div class="th">Venta</div><div class="th">Δ%</div><div class="th">Tareas</div></div>
+          <div id="dash-clients"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px;">
+        <div>
+          <div class="sec-hdr"><div class="sec-title">Tareas del día</div></div>
+          <div class="card" id="dash-tasks"></div>
+        </div>
+        <div>
+          <div class="sec-hdr"><div class="sec-title">Alertas recientes</div></div>
+          <div class="card">
+            <div class="ai"><div class="adot ar"></div><div><div class="at">Doral: ventas −18.8%</div><div class="ad">Requiere acción inmediata</div><div class="atm">Hace 2h · Sistema</div></div></div>
+            <div class="ai"><div class="adot ar"></div><div><div class="at">Negroni: cancelaciones 4.8%</div><div class="ad">Fuera del rango saludable (3%)</div><div class="atm">Hace 4h · Sistema</div></div></div>
+            <div class="ai"><div class="adot aa"></div><div><div class="at">Paperfish SB: NPS bajó a 4.4</div><div class="ad">Cayó 0.2 vs mes anterior</div><div class="atm">Hace 5h · Sistema</div></div></div>
+            <div class="ai"><div class="adot ag"></div><div><div class="at">Sushimas: recompra récord 63%</div><div class="ad">Mejor mes del cliente</div><div class="atm">Ayer · Sistema</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       CLIENTES
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-clientes">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Mis Clientes</div><div class="sec-sub">24 activos · USA / CAN / RD</div></div><button class="bp">+ Nuevo cliente</button></div>
+    <div class="tbl">
+      <div class="tf">
+        <button class="fc on" onclick="filterC(this,'all')">Todos</button>
+        <button class="fc" onclick="filterC(this,'red')">En riesgo</button>
+        <button class="fc" onclick="filterC(this,'amber')">Atención</button>
+        <button class="fc" onclick="filterC(this,'green')">OK</button>
+        <input class="si" placeholder="Buscar cliente...">
+      </div>
+      <div class="th-row cols7"><div class="th">Cliente</div><div class="th">Estado</div><div class="th">NPS</div><div class="th">Conv.</div><div class="th">Venta</div><div class="th">Δ%</div><div class="th">Tareas</div></div>
+      <div id="all-clients"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       TAREAS
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-tareas">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Mis Tareas</div><div class="sec-sub">8 pendientes · 2 vencidas</div></div><button class="bp">+ Nueva tarea</button></div>
+    <div class="g2r">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Todas las tareas</div>
+          <select style="font-size:10.5px;border:1px solid var(--sand2);border-radius:5px;padding:2px 6px;font-family:'DM Sans',sans-serif;color:var(--inkl);background:var(--cream);outline:none;">
+            <option>Todas</option><option>Hoy</option><option>Esta semana</option><option>Vencidas</option>
+          </select>
+        </div>
+        <div id="all-tasks"></div>
+        <div class="add-row"><input class="add-i" placeholder="Nueva tarea..." id="gti"><button class="bp" style="font-size:11px;padding:4px 10px;" onclick="addTask()">+</button></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;">
+        <div class="card" style="padding:13px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Resumen</div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--sand);"><span style="font-size:11.5px;color:var(--inkl);">Pendientes</span><span style="font-size:12px;font-weight:700;">8</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--sand);"><span style="font-size:11.5px;color:var(--inkl);">Vencidas</span><span style="font-size:12px;font-weight:700;color:var(--danger);">2</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--sand);"><span style="font-size:11.5px;color:var(--inkl);">Completadas esta semana</span><span style="font-size:12px;font-weight:700;color:var(--green);">5</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;"><span style="font-size:11.5px;color:var(--inkl);">Total histórico</span><span style="font-size:12px;font-weight:700;">48</span></div>
+        </div>
+        <div class="card" style="padding:13px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Por tipo</div>
+<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--danger);flex-shrink:0"></div><span style="font-size:11.5px;flex:1">Operación</span><div style="width:66px;height:6px;background:var(--danger);border-radius:3px;opacity:.7"></div><span style="font-size:12px;font-weight:700;width:12px">3</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0"></div><span style="font-size:11.5px;flex:1">Reporte</span><div style="width:44px;height:6px;background:var(--amber);border-radius:3px;opacity:.7"></div><span style="font-size:12px;font-weight:700;width:12px">2</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0"></div><span style="font-size:11.5px;flex:1">Campaña</span><div style="width:22px;height:6px;background:var(--blue);border-radius:3px;opacity:.7"></div><span style="font-size:12px;font-weight:700;width:12px">1</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0"></div><span style="font-size:11.5px;flex:1">Análisis</span><div style="width:22px;height:6px;background:var(--green);border-radius:3px;opacity:.7"></div><span style="font-size:12px;font-weight:700;width:12px">1</span></div><div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:7px;height:7px;border-radius:50%;background:var(--inkl);flex-shrink:0"></div><span style="font-size:11.5px;flex:1">Estrategia</span><div style="width:22px;height:6px;background:var(--inkl);border-radius:3px;opacity:.7"></div><span style="font-size:12px;font-weight:700;width:12px">1</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ALERTAS
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-alertas">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Alertas</div><div class="sec-sub">Actualización cada 4h · próxima en 2h</div></div><button class="bg">⚙ Configurar umbrales</button></div>
+    <div class="g3" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">Críticas activas</div><div class="stat-v" style="color:var(--danger)">2</div><div class="stat-d dn">Requieren acción ahora</div></div>
+      <div class="stat"><div class="stat-l">Atención</div><div class="stat-v" style="color:var(--amber)">1</div><div class="stat-d nt">Monitorear de cerca</div></div>
+      <div class="stat"><div class="stat-l">Resueltas esta semana</div><div class="stat-v" style="color:var(--green)">4</div><div class="stat-d up">↑ 2 vs semana anterior</div></div>
+    </div>
+    <div class="g2r">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Alertas activas</div><div style="display:flex;gap:4px;"><button class="fc on" style="font-size:10px;">Activas</button><button class="fc" style="font-size:10px;">Resueltas</button></div></div>
+        <div class="ai" style="background:#FEF5F4;"><div class="adot ar"></div><div style="flex:1;"><div class="at">Baires Grill – Doral: caída de ventas −18.8%</div><div class="ad">Cayó por debajo del umbral (−15%). Tarea automática creada: "Revisar operación Doral"</div><div class="atm">Hoy 09:14 · Sistema automático</div></div><button class="bg" style="font-size:10px;padding:3px 7px;">Resolver</button></div>
+        <div class="ai" style="background:#FEF5F4;"><div class="adot ar"></div><div style="flex:1;"><div class="at">Negroni: cancelaciones 4.8% (umbral: 3%)</div><div class="ad">Cancelaciones fuera del rango saludable. Requiere revisión con el restaurant.</div><div class="atm">Hoy 07:02 · Sistema automático</div></div><button class="bg" style="font-size:10px;padding:3px 7px;">Resolver</button></div>
+        <div class="ai" style="background:#FFFBF0;"><div class="adot aa"></div><div style="flex:1;"><div class="at">Paperfish South Beach: NPS bajó a 4.4</div><div class="ad">Cayó 0.2 puntos vs mes anterior. Monitorear reseñas recientes.</div><div class="atm">Ayer 18:30 · Sistema automático</div></div><button class="bg" style="font-size:10px;padding:3px 7px;">Resolver</button></div>
+        <div class="ai" style="opacity:.6;"><div class="adot ag"></div><div style="flex:1;"><div class="at">✓ Sushimas: conversión recuperada a 18%</div><div class="ad">Volvió al rango saludable. Alerta resuelta automáticamente.</div><div class="atm">Mar 05 · Sistema automático</div></div><span style="font-size:10.5px;color:var(--green);font-weight:700;">Resuelto</span></div>
+      </div>
+      <div>
+        <div class="sec-title" style="margin-bottom:10px;">Umbrales configurados</div>
+        <div class="card" style="padding:13px;">
+<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">Ventas</span><span style="font-size:11px;flex:1;color:var(--inkl)">Caída > 15% semanal</span><span style="font-size:10px;font-weight:700">🔴 Crítica</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">Ventas</span><span style="font-size:11px;flex:1;color:var(--inkl)">Caída 8–15% semanal</span><span style="font-size:10px;font-weight:700">🟡 Atención</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">NPS</span><span style="font-size:11px;flex:1;color:var(--inkl)">&lt; 4.3</span><span style="font-size:10px;font-weight:700">🔴 Crítica</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">NPS</span><span style="font-size:11px;flex:1;color:var(--inkl)">Bajó 0.3+ vs mes ant.</span><span style="font-size:10px;font-weight:700">🟡 Atención</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">Cancelaciones</span><span style="font-size:11px;flex:1;color:var(--inkl)">> 3%</span><span style="font-size:10px;font-weight:700">🔴 Crítica</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">Conversión</span><span style="font-size:11px;flex:1;color:var(--inkl)">Caída > 20%</span><span style="font-size:10px;font-weight:700">🟡 Atención</span></div><div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand)"><span style="font-size:10px;background:var(--sand);color:var(--inkl);padding:1px 6px;border-radius:3px;font-weight:600;width:90px;text-align:center">Sin pedidos</span><span style="font-size:11px;flex:1;color:var(--inkl)">24 horas</span><span style="font-size:10px;font-weight:700">🔴 Crítica</span></div>
+          <div style="margin-top:8px;"><button class="bg" style="font-size:11px;width:100%;">✏ Editar umbrales</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       REPORTE SEMANAL
+  ══════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════
+       REPORTE SEMANAL
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-rep-semanal">
+    <div class="sec-hdr" style="margin-bottom:14px;"><div><div class="sec-title">Reporte Semanal</div><div class="sec-sub">Datos reales · BigQuery · Op_Weekly_db</div></div></div>
+    <div class="g2r2">
+      <div class="rc">
+        <div class="rc-hdr"><div class="rc-title">⚙ Configurar</div><div class="rc-sub" id="rs-sub">Seleccioná un cliente</div></div>
+        <div class="rc-body">
+          <div class="rc-sec"><div class="rc-label">Growth Manager</div>
+            <select class="fsel" id="rs-gm" onchange="rsLoadClients()">
+              <option value="">— Seleccionar GM —</option>
+              <option>Kevin Ostrovsky</option><option>Franco DiFabio</option><option>Daniel Morán</option>
+              <option>Daniella Bayona</option><option>Sofia Buscio</option><option>Martin Camacho</option>
+              <option>Katiuska Infante</option><option>Gabriel Chaylle</option><option>Andrés Tolosa</option>
+              <option>Nicolas López</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Cliente</div>
+            <select class="fsel" id="rs-cliente">
+              <option value="">— Primero elegí el GM —</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Período</div>
+            <select class="fsel" id="rs-periodo">
+              <option value="2026-03-01">Sem 1–7 Mar 2026</option>
+              <option value="2026-02-22">Sem 22–28 Feb 2026</option>
+              <option value="2026-02-15">Sem 15–21 Feb 2026</option>
+              <option value="2026-02-08">Sem 8–14 Feb 2026</option>
+              <option value="2026-02-01">Sem 1–7 Feb 2026</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">App</div>
+            <select class="fsel" id="rs-app">
+              <option value="">Todas</option>
+              <option>Uber Eats</option><option>Rappi</option><option>Pedidos Ya</option>
+              <option>DoorDash</option><option>Glovo</option><option>iFood</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Secciones</div><div class="tgl-g">
+            <button class="tgl on" onclick="this.classList.toggle('on')">Ventas</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Pedidos</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">NPS</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Análisis GM</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">WhatsApp</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Próximos pasos</button>
+          </div></div>
+          <div class="rc-sec"><div class="rc-label">Idioma</div><div class="tgl-g">
+            <button class="tgl on" onclick="setLang(this)">Español</button>
+            <button class="tgl" onclick="setLang(this)">English</button>
+            <button class="tgl" onclick="setLang(this)">Português</button>
+          </div></div>
+        </div>
+        <div class="rc-foot">
+          <button class="bp" style="flex:1" onclick="generarReporte('semanal')" id="rs-btn">⚡ Generar con IA</button>
+        </div>
+      </div>
+      <div class="rp" id="rs-preview">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--inkf);padding:40px;">
+          <div style="font-size:40px;opacity:.3">📄</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:16px;opacity:.5">Seleccioná GM y cliente</div>
+          <div style="font-size:12px;opacity:.4;text-align:center">El reporte se genera automáticamente<br>con datos reales de BigQuery</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       REPORTE OPERACIONES
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-rep-ops">
+    <div class="sec-hdr" style="margin-bottom:14px;"><div><div class="sec-title">Reporte Operaciones</div><div class="sec-sub">Datos reales · NPS · Cancelaciones · Disponibilidad</div></div></div>
+    <div class="g2r2">
+      <div class="rc">
+        <div class="rc-hdr"><div class="rc-title">⚙ Configurar</div><div class="rc-sub" id="ro-sub">Seleccioná un cliente</div></div>
+        <div class="rc-body">
+          <div class="rc-sec"><div class="rc-label">Growth Manager</div>
+            <select class="fsel" id="ro-gm" onchange="roLoadClients()">
+              <option value="">— Seleccionar GM —</option>
+              <option>Kevin Ostrovsky</option><option>Franco DiFabio</option><option>Daniel Morán</option>
+              <option>Daniella Bayona</option><option>Sofia Buscio</option><option>Martin Camacho</option>
+              <option>Katiuska Infante</option><option>Gabriel Chaylle</option><option>Andrés Tolosa</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Cliente</div>
+            <select class="fsel" id="ro-cliente"><option value="">— Primero elegí el GM —</option></select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Período</div>
+            <select class="fsel" id="ro-periodo">
+              <option>Semana 1–7 Mar 2026</option><option>Semana 22–28 Feb 2026</option>
+              <option>Últimas 2 semanas</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Métricas</div><div class="tgl-g">
+            <button class="tgl on" onclick="this.classList.toggle('on')">NPS</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Cancelaciones</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Disponibilidad</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Demoras</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Conversión</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Recompra</button>
+          </div></div>
+        </div>
+        <div class="rc-foot">
+          <button class="bp" style="flex:1" onclick="generarReporte('ops')" id="ro-btn">⚡ Generar con IA</button>
+        </div>
+      </div>
+      <div class="rp" id="ro-preview">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--inkf);padding:40px;">
+          <div style="font-size:40px;opacity:.3">📋</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:16px;opacity:.5">Seleccioná GM y cliente</div>
+          <div style="font-size:12px;opacity:.4;text-align:center">Reporte operativo con NPS, cancelaciones<br>y disponibilidad por sucursal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       REPORTE MENSUAL / MBR
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-rep-mensual">
+    <div class="sec-hdr" style="margin-bottom:14px;"><div><div class="sec-title">Reporte Mensual · MBR</div><div class="sec-sub">Datos reales · Op_Monthly_db · Genera PDF/PPT</div></div></div>
+    <div class="g2r2">
+      <div class="rc">
+        <div class="rc-hdr"><div class="rc-title">⚙ Configurar</div><div class="rc-sub" id="rm-sub">Seleccioná un cliente</div></div>
+        <div class="rc-body">
+          <div class="rc-sec"><div class="rc-label">Growth Manager</div>
+            <select class="fsel" id="rm-gm" onchange="rmLoadClients()">
+              <option value="">— Seleccionar GM —</option>
+              <option>Kevin Ostrovsky</option><option>Franco DiFabio</option><option>Daniel Morán</option>
+              <option>Daniella Bayona</option><option>Sofia Buscio</option><option>Martin Camacho</option>
+              <option>Katiuska Infante</option><option>Gabriel Chaylle</option><option>Andrés Tolosa</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Cliente</div>
+            <select class="fsel" id="rm-cliente"><option value="">— Primero elegí el GM —</option></select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Mes</div>
+            <select class="fsel" id="rm-mes">
+              <option value="2026-02">Febrero 2026</option>
+              <option value="2026-01">Enero 2026</option>
+              <option value="2025-12">Diciembre 2025</option>
+              <option value="2025-11">Noviembre 2025</option>
+              <option value="2025-10">Octubre 2025</option>
+            </select>
+          </div>
+          <div class="rc-sec"><div class="rc-label">Secciones</div><div class="tgl-g">
+            <button class="tgl on" onclick="this.classList.toggle('on')">Ventas mensual</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Tendencia 6m</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">NPS histórico</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Operaciones</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Por app</button>
+            <button class="tgl on" onclick="this.classList.toggle('on')">Próximos pasos</button>
+          </div></div>
+        </div>
+        <div class="rc-foot">
+          <button class="bp" style="flex:1" onclick="generarReporte('mensual')" id="rm-btn">⚡ Generar con IA</button>
+          <button class="bb" onclick="alert('Exportación a PDF/PPT disponible en la versión con servidor')">⬇ PDF</button>
+        </div>
+      </div>
+      <div class="rp" id="rm-preview">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--inkf);padding:40px;">
+          <div style="font-size:40px;opacity:.3">📊</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:16px;opacity:.5">MBR completo en segundos</div>
+          <div style="font-size:12px;opacity:.4;text-align:center">Tendencia 6 meses, NPS histórico,<br>benchmark y próximos pasos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       MÉTRICAS — BIGQUERY REAL
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-metricas">
+    <div class="sec-hdr" style="margin-bottom:13px;">
+      <div><div class="sec-title">Métricas</div><div class="sec-sub">BigQuery · iron-bedrock-432920-d0 · 707K+ registros</div></div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <span style="font-size:9px;background:var(--gbg);color:var(--green);padding:2px 8px;border-radius:10px;font-weight:700;">● BQ Conectado</span>
+      </div>
+    </div>
+
+    <!-- FILTROS -->
+    <div style="background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:14px;margin-bottom:13px;">
+      <div style="display:grid;grid-template-columns:repeat(6,1fr) auto;gap:8px;align-items:end;">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Vista</div>
+          <div style="display:flex;gap:3px;">
+            <button class="met-tab on" onclick="setMetTab(this,'weekly')">Semanal</button>
+            <button class="met-tab" onclick="setMetTab(this,'monthly')">Mensual</button>
+            <button class="met-tab" onclick="setMetTab(this,'daily')">Diario</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">País</div>
+          <select class="fsel" style="margin:0;font-size:11px;" id="met-pais">
+            <option value="">Todos</option>
+            <option>Estados Unidos</option><option>Argentina</option><option>Colombia</option>
+            <option>México</option><option>Chile</option><option>Perú</option>
+            <option>España</option><option>República Dominicana</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">App</div>
+          <select class="fsel" style="margin:0;font-size:11px;" id="met-app">
+            <option value="">Todas</option>
+            <option>Uber Eats</option><option>Rappi</option><option>Pedidos Ya</option>
+            <option>DoorDash</option><option>Glovo</option><option>iFood</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">GM</div>
+          <select class="fsel" style="margin:0;font-size:11px;" id="met-gm">
+            <option value="">Todos</option>
+            <option>Kevin Ostrovsky</option><option>Franco DiFabio</option><option>Daniel Morán</option>
+            <option>Daniella Bayona</option><option>Sofia Buscio</option><option>Martin Camacho</option>
+            <option>Katiuska Infante</option><option>Gabriel Chaylle</option><option>Andrés Tolosa</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Marca / Cliente</div>
+          <input class="fsel" type="text" placeholder="ej: Baires Grill..." id="met-marca" style="margin:0;font-size:11px;">
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Período</div>
+          <select class="fsel" style="margin:0;font-size:11px;" id="met-periodo">
+            <option value="2026-01-01|2026-03-07">Ene–Mar 2026</option>
+            <option value="2025-10-01|2026-03-07">Últimos 6 meses</option>
+            <option value="2026-02-01|2026-02-28">Solo Feb 2026</option>
+            <option value="2025-07-01|2025-12-31">2do Semestre 2025</option>
+          </select>
+        </div>
+        <button class="bp" style="height:32px;padding:0 14px;font-size:12px;" onclick="runMetricas()" id="met-btn">
+          ▶ Consultar
+        </button>
+      </div>
+
+      <!-- QUICK FILTERS -->
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+        <span style="font-size:9px;color:var(--inkf);align-self:center;font-weight:700;">RÁPIDO:</span>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('usa')">🇺🇸 USA</button>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('arg')">🇦🇷 Argentina</button>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('esp')">🇪🇸 España</button>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('ubereats')">Uber Eats</button>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('rappi')">Rappi</button>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('alertas')">🔴 Con alertas</button>
+        <button class="bg" style="font-size:10px;padding:3px 10px;" onclick="quickMet('top')">🏆 Top ventas</button>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="met-empty" style="background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:50px;text-align:center;color:var(--inkf);">
+      <div style="font-size:36px;opacity:.3;margin-bottom:12px;">📈</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;opacity:.5;margin-bottom:6px;">Seleccioná filtros y consultá</div>
+      <div style="font-size:11px;opacity:.4;">Conectado a iron-bedrock-432920-d0.Sales · 4 tablas · 1.4M+ registros</div>
+    </div>
+
+    <div id="met-loading" style="display:none;background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:50px;text-align:center;">
+      <div style="width:28px;height:28px;border:2px solid var(--sand2);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div>
+      <div style="font-size:12px;color:var(--inkf);font-family:monospace;" id="met-loading-q">Consultando Op_Weekly_db...</div>
+    </div>
+
+    <div id="met-results" style="display:none;">
+      <!-- KPI Row -->
+      <div class="g4" style="margin-bottom:13px;" id="met-kpis"></div>
+
+      <!-- IA Insight -->
+      <div id="met-insight-box" style="background:var(--ink);border-radius:10px;padding:14px 16px;display:flex;gap:12px;margin-bottom:13px;display:none;">
+        <div style="font-size:20px;flex-shrink:0;">🤖</div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;">Análisis automático · Pimentón IA</div>
+          <div style="font-size:12px;color:#D4C8BC;line-height:1.6;" id="met-insight-txt"></div>
+          <div style="font-size:9px;color:#4A4038;margin-top:6px;" id="met-insight-meta"></div>
+        </div>
+      </div>
+
+      <!-- Tabla sucursales -->
+      <div class="tbl" style="margin-bottom:13px;">
+        <div class="card-hdr">
+          <div class="card-title">Detalle por Sucursal</div>
+          <div style="display:flex;gap:7px;align-items:center;">
+            <span style="font-size:10px;color:var(--inkf);" id="met-row-count"></span>
+            <button class="bg" style="font-size:11px;" onclick="exportMetCSV()">↓ CSV</button>
+          </div>
+        </div>
+        <div class="th-row" id="met-thead" style="grid-template-columns:2fr 80px 60px 65px 68px 68px 68px 70px 75px;"></div>
+        <div id="met-tbody"></div>
+      </div>
+
+      <!-- Top/Bottom -->
+      <div class="g2" style="margin-bottom:13px;">
+        <div class="card" style="padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px;">🏆 Top 5 — Ventas</div>
+          <div id="met-top5"></div>
+        </div>
+        <div class="card" style="padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:10px;">⚠️ Requieren Atención</div>
+          <div id="met-bottom5"></div>
+        </div>
+      </div>
+
+      <!-- Por App -->
+      <div>
+        <div class="sec-hdr" style="margin-bottom:10px;"><div class="sec-title">Breakdown por App</div></div>
+        <div class="g4" id="met-apps"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       DIAGNÓSTICO AUTOMÁTICO
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-diagnostico">
+    <div class="sec-hdr" style="margin-bottom:13px;">
+      <div><div class="sec-title">Diagnóstico Automático</div><div class="sec-sub">Análisis IA con datos reales de BigQuery · Op_Monthly_db</div></div>
+      <button class="bp" onclick="runDiagnostico()">⚡ Analizar cartera</button>
+    </div>
+
+    <!-- Config -->
+    <div style="background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:14px;margin-bottom:13px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Growth Manager</div>
+          <select class="fsel" style="margin:0;" id="diag-gm">
+            <option value="">Toda la empresa</option>
+            <option>Kevin Ostrovsky</option><option>Franco DiFabio</option><option>Daniel Morán</option>
+            <option>Daniella Bayona</option><option>Sofia Buscio</option><option>Martin Camacho</option>
+            <option>Katiuska Infante</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Mes de referencia</div>
+          <select class="fsel" style="margin:0;" id="diag-mes">
+            <option value="2026-02">Febrero 2026</option>
+            <option value="2026-01">Enero 2026</option>
+            <option value="2025-12">Diciembre 2025</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:var(--inkf);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">País</div>
+          <select class="fsel" style="margin:0;" id="diag-pais">
+            <option value="">Todos</option>
+            <option>Estados Unidos</option><option>Argentina</option><option>Colombia</option>
+            <option>México</option><option>España</option>
+          </select>
+        </div>
+        <button class="bp" onclick="runDiagnostico()" style="height:32px;padding:0 16px;">⚡ Analizar</button>
+      </div>
+    </div>
+
+    <!-- KPIs resumen -->
+    <div class="g4" style="margin-bottom:13px;" id="diag-kpis">
+      <div class="stat"><div class="stat-l">Clientes analizados</div><div class="stat-v">—</div><div class="stat-d nt">Presioná Analizar</div></div>
+      <div class="stat"><div class="stat-l">Score promedio</div><div class="stat-v">—</div><div class="stat-d nt">0–100</div></div>
+      <div class="stat"><div class="stat-l">Zona crítica</div><div class="stat-v" style="color:var(--danger)">—</div><div class="stat-d nt">Score &lt; 60</div></div>
+      <div class="stat"><div class="stat-l">Excelentes</div><div class="stat-v" style="color:var(--green)">—</div><div class="stat-d nt">Score &gt; 80</div></div>
+    </div>
+
+    <!-- Loading -->
+    <div id="diag-loading" style="display:none;background:#fff;border:1px solid var(--sand2);border-radius:10px;padding:40px;text-align:center;">
+      <div style="width:28px;height:28px;border:2px solid var(--sand2);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div>
+      <div style="font-size:12px;color:var(--inkf);">Analizando cartera con IA...</div>
+      <div style="font-size:10px;color:var(--inkf);margin-top:4px;font-family:monospace;">SELECT * FROM Sales.Op_Monthly_db WHERE Growth_Manager = '...'</div>
+    </div>
+
+    <!-- Diagnósticos -->
+    <div id="diag-list"></div>
+  </div>
+
+
+    <!-- ══════════════════════════════════════════════
+       CAMPAÑAS
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-campanas">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Campañas</div><div class="sec-sub">6 activas · 1 pausada</div></div><button class="bp">+ Nueva campaña</button></div>
+    <div class="g4" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">Activas</div><div class="stat-v" style="color:var(--green)">6</div><div class="stat-d up">↑ 2 vs mes anterior</div></div>
+      <div class="stat"><div class="stat-l">Ventas generadas</div><div class="stat-v">$62K</div><div class="stat-d up">↑ 14%</div></div>
+      <div class="stat"><div class="stat-l">ROAS promedio</div><div class="stat-v">3.1x</div><div class="stat-d up">↑ 0.3x</div></div>
+      <div class="stat"><div class="stat-l">Conversión prom.</div><div class="stat-v">13.2%</div><div class="stat-d dn">↓ 1.2%</div></div>
+    </div>
+    <div class="g3">
+<div class="card" style="padding:13px">
+<div style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-bottom:7px;background:var(--gbg);color:var(--green)">● Activa</div>
+<div style="font-size:12.5px;font-weight:700;margin-bottom:2px">BOGO Empanadas</div>
+<div style="font-size:10.5px;color:var(--inkf);margin-bottom:10px">Baires Grill · Uber Eats · todas las suc.</div>
+<div style="display:flex;gap:12px">
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Conv.</div><div style="font-size:14px;font-weight:700">14.4%</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:14px;font-weight:700">$18K</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">ROAS</div><div style="font-size:14px;font-weight:700;color:var(--green)">3.2x</div></div>
+</div></div><div class="card" style="padding:13px">
+<div style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-bottom:7px;background:var(--gbg);color:var(--green)">● Activa</div>
+<div style="font-size:12.5px;font-weight:700;margin-bottom:2px">Free Delivery Weekends</div>
+<div style="font-size:10.5px;color:var(--inkf);margin-bottom:10px">Baires Grill · Uber Eats · Brickell / Midtown</div>
+<div style="display:flex;gap:12px">
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Conv.</div><div style="font-size:14px;font-weight:700">12.1%</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:14px;font-weight:700">$9K</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">ROAS</div><div style="font-size:14px;font-weight:700;color:var(--green)">2.8x</div></div>
+</div></div><div class="card" style="padding:13px">
+<div style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-bottom:7px;background:var(--gbg);color:var(--green)">● Activa</div>
+<div style="font-size:12.5px;font-weight:700;margin-bottom:2px">30% Off Lunes</div>
+<div style="font-size:10.5px;color:var(--inkf);margin-bottom:10px">Paperfish SB · Uber Eats</div>
+<div style="display:flex;gap:12px">
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Conv.</div><div style="font-size:14px;font-weight:700">11.2%</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:14px;font-weight:700">$4.2K</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">ROAS</div><div style="font-size:14px;font-weight:700;color:var(--green)">2.1x</div></div>
+</div></div><div class="card" style="padding:13px">
+<div style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-bottom:7px;background:var(--gbg);color:var(--green)">● Activa</div>
+<div style="font-size:12.5px;font-weight:700;margin-bottom:2px">BOGO Sushi Roll</div>
+<div style="font-size:10.5px;color:var(--inkf);margin-bottom:10px">Sushimas · Rappi · PedidosYa</div>
+<div style="display:flex;gap:12px">
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Conv.</div><div style="font-size:14px;font-weight:700">18.3%</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:14px;font-weight:700">$12K</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">ROAS</div><div style="font-size:14px;font-weight:700;color:var(--green)">4.1x</div></div>
+</div></div><div class="card" style="padding:13px">
+<div style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-bottom:7px;background:var(--sand);color:var(--inkf)">⏸ Pausada</div>
+<div style="font-size:12.5px;font-weight:700;margin-bottom:2px">Happy Hour −20%</div>
+<div style="font-size:10.5px;color:var(--inkf);margin-bottom:10px">Negroni · PedidosYa</div>
+<div style="display:flex;gap:12px">
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Conv.</div><div style="font-size:14px;font-weight:700">—</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:14px;font-weight:700">—</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">ROAS</div><div style="font-size:14px;font-weight:700;color:var(--inkf)">—</div></div>
+</div></div><div class="card" style="padding:13px">
+<div style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-bottom:7px;background:var(--gbg);color:var(--green)">● Activa</div>
+<div style="font-size:12.5px;font-weight:700;margin-bottom:2px">Free Delivery Weekend</div>
+<div style="font-size:10.5px;color:var(--inkf);margin-bottom:10px">Sushimas · PedidosYa</div>
+<div style="display:flex;gap:12px">
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Conv.</div><div style="font-size:14px;font-weight:700">9.8%</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:14px;font-weight:700">$6.5K</div></div>
+<div><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">ROAS</div><div style="font-size:14px;font-weight:700;color:var(--green)">2.4x</div></div>
+</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ONBOARDING
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-onboarding">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Clientes en Onboarding</div><div class="sec-sub">3 en proceso · 2 completados este mes</div></div><button class="bp">+ Nuevo onboarding</button></div>
+    <div class="g3" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">En proceso</div><div class="stat-v" style="color:var(--blue)">3</div><div class="stat-d nt">Promedio: 45% completado</div></div>
+      <div class="stat"><div class="stat-l">Completados este mes</div><div class="stat-v" style="color:var(--green)">2</div><div class="stat-d up">Promedio: 18 días</div></div>
+      <div class="stat"><div class="stat-l">Próx. vencimiento</div><div class="stat-v" style="color:var(--amber)">Mar 14</div><div class="stat-d nt">La Mezzetta Miami</div></div>
+    </div>
+<div class="onb">
+<div class="onb-hdr"><div><div class="onb-name">La Mezzetta Miami</div><div style="font-size:10.5px;color:var(--inkf)">GM: Franco DiFabio · USA · Miami · Inicio: 20 Feb</div></div>
+<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--blue)">75%</div><div style="font-size:10px;color:var(--inkf)">completado</div></div></div>
+<div class="onb-prog"><div class="onb-bar" style="width:75%"></div></div>
+<div class="onb-steps"><span class="onb-step os-done">✓ Contrato firmado</span><span class="onb-step os-done">✓ Datos cargados</span><span class="onb-step os-done">✓ Apps conectadas</span><span class="onb-step os-done">✓ Menú optimizado</span><span class="onb-step os-act">→ Primera campaña</span><span class="onb-step os-todo">Primer reporte</span></div></div><div class="onb">
+<div class="onb-hdr"><div><div class="onb-name">Taquería El Fuego</div><div style="font-size:10.5px;color:var(--inkf)">GM: Daniel Morán · USA · Los Angeles · Inicio: 1 Mar</div></div>
+<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--blue)">40%</div><div style="font-size:10px;color:var(--inkf)">completado</div></div></div>
+<div class="onb-prog"><div class="onb-bar" style="width:40%"></div></div>
+<div class="onb-steps"><span class="onb-step os-done">✓ Contrato firmado</span><span class="onb-step os-done">✓ Datos cargados</span><span class="onb-step os-act">→ Apps conectadas</span><span class="onb-step os-todo">Menú optimizado</span><span class="onb-step os-todo">Primera campaña</span><span class="onb-step os-todo">Primer reporte</span></div></div><div class="onb">
+<div class="onb-hdr"><div><div class="onb-name">Sushi Wok Orlando</div><div style="font-size:10.5px;color:var(--inkf)">GM: Daniella Bayona · USA · Orlando · Inicio: 5 Mar</div></div>
+<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--blue)">17%</div><div style="font-size:10px;color:var(--inkf)">completado</div></div></div>
+<div class="onb-prog"><div class="onb-bar" style="width:17%"></div></div>
+<div class="onb-steps"><span class="onb-step os-done">✓ Contrato firmado</span><span class="onb-step os-act">→ Datos cargados</span><span class="onb-step os-todo">Apps conectadas</span><span class="onb-step os-todo">Menú optimizado</span><span class="onb-step os-todo">Primera campaña</span><span class="onb-step os-todo">Primer reporte</span></div></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       COUNTRY MANAGER
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-country">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Vista Country Manager — USA / CAN / RD</div><div class="sec-sub">Kevin Ostrovsky · 24 clientes · 5 GMs</div></div></div>
+    <div class="g4" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">Clientes región</div><div class="stat-v">24</div><div class="stat-d nt">4 países</div></div>
+      <div class="stat"><div class="stat-l">Venta región</div><div class="stat-v">$312K</div><div class="stat-d up">↑ 8.4%</div></div>
+      <div class="stat"><div class="stat-l">En riesgo</div><div class="stat-v" style="color:var(--danger)">3</div><div class="stat-d dn">↑ 1 esta semana</div></div>
+      <div class="stat"><div class="stat-l">NPS promedio región</div><div class="stat-v" style="color:var(--amber)">4.5</div><div class="stat-d dn">↓ 0.1 vs mes ant.</div></div>
+    </div>
+    <div class="g2r">
+      <div>
+        <div class="sec-hdr"><div class="sec-title">Mi equipo de GMs</div></div>
+        <div class="card" style="margin-bottom:13px;">
+<div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--sand)">
+<div class="av" style="background:var(--blue);width:30px;height:30px">FD</div>
+<div style="flex:1"><div style="font-size:12.5px;font-weight:700">Franco DiFabio</div><div style="font-size:10.5px;color:var(--inkf)">GM Sr · USA</div></div>
+<div style="display:flex;gap:14px">
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Clientes</div><div style="font-size:14px;font-weight:700">8</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:12px;font-weight:700">$124K</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">En riesgo</div><div style="font-size:14px;font-weight:700;color:var(--danger)">1</div></div>
+</div></div><div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--sand)">
+<div class="av" style="background:var(--blue);width:30px;height:30px">DM</div>
+<div style="flex:1"><div style="font-size:12.5px;font-weight:700">Daniel Morán</div><div style="font-size:10.5px;color:var(--inkf)">GM Sr · USA</div></div>
+<div style="display:flex;gap:14px">
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Clientes</div><div style="font-size:14px;font-weight:700">7</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:12px;font-weight:700">$98K</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">En riesgo</div><div style="font-size:14px;font-weight:700;color:var(--danger)">1</div></div>
+</div></div><div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--sand)">
+<div class="av" style="background:var(--green);width:30px;height:30px">DB</div>
+<div style="flex:1"><div style="font-size:12.5px;font-weight:700">Daniella Bayona</div><div style="font-size:10.5px;color:var(--inkf)">GM · USA</div></div>
+<div style="display:flex;gap:14px">
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Clientes</div><div style="font-size:14px;font-weight:700">6</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:12px;font-weight:700">$56K</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">En riesgo</div><div style="font-size:14px;font-weight:700;color:var(--green)">0</div></div>
+</div></div><div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--sand)">
+<div class="av" style="background:var(--amber);width:30px;height:30px">MC</div>
+<div style="flex:1"><div style="font-size:12.5px;font-weight:700">Martín Camacho</div><div style="font-size:10.5px;color:var(--inkf)">GM · RD</div></div>
+<div style="display:flex;gap:14px">
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Clientes</div><div style="font-size:14px;font-weight:700">5</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:12px;font-weight:700">$22K</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">En riesgo</div><div style="font-size:14px;font-weight:700;color:var(--danger)">1</div></div>
+</div></div><div style="display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid var(--sand)">
+<div class="av" style="background:var(--inkf);width:30px;height:30px">NL</div>
+<div style="flex:1"><div style="font-size:12.5px;font-weight:700">Nicolas Lopez</div><div style="font-size:10.5px;color:var(--inkf)">Customer Success</div></div>
+<div style="display:flex;gap:14px">
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Clientes</div><div style="font-size:14px;font-weight:700">14</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">Ventas</div><div style="font-size:12px;font-weight:700">—</div></div>
+<div style="text-align:center"><div style="font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--inkf)">En riesgo</div><div style="font-size:14px;font-weight:700;color:var(--danger)">2</div></div>
+</div></div>
+        </div>
+        <div class="sec-hdr"><div class="sec-title">Carga de tareas por GM</div></div>
+<div class="card" style="padding:13px"><div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Franco DiFabio</span><span style="font-weight:700">5 tareas</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:50%;height:100%;background:var(--blue);border-radius:4px"></div></div></div><div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Daniel Morán</span><span style="font-weight:700">4 tareas</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:40%;height:100%;background:var(--blue);border-radius:4px"></div></div></div><div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Daniella Bayona</span><span style="font-weight:700">6 tareas</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:60%;height:100%;background:var(--amber);border-radius:4px"></div></div></div><div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Martín Camacho</span><span style="font-weight:700">3 tareas</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:30%;height:100%;background:var(--blue);border-radius:4px"></div></div></div><div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Nicolas Lopez</span><span style="font-weight:700">8 tareas</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:80%;height:100%;background:var(--danger);border-radius:4px"></div></div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <div class="sec-title" style="margin-bottom:9px;">Alertas de región</div>
+          <div class="card">
+            <div class="ai"><div class="adot ar"></div><div><div class="at">Doral: −18.8% ventas</div><div class="ad">Franco DiFabio asignado · tarea creada</div><div class="atm">Hace 2h</div></div></div>
+            <div class="ai"><div class="adot ar"></div><div><div class="at">Negroni: cancelaciones 4.8%</div><div class="ad">Daniel Morán asignado</div><div class="atm">Hace 4h</div></div></div>
+            <div class="ai"><div class="adot aa"></div><div><div class="at">Paperfish SB: NPS 4.4</div><div class="ad">Franco DiFabio asignado</div><div class="atm">Hace 5h</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-title" style="margin-bottom:9px;">Países</div>
+<div class="g2" style="gap:7px"><div class="card" style="padding:11px;text-align:center"><div style="font-size:22px">🇺🇸</div><div style="font-size:12px;font-weight:700;margin-top:3px">USA</div><div style="font-size:10px;color:var(--inkf)">20 clientes</div><div style="font-family:'DM Serif Display',serif;font-size:15px;margin-top:5px">$285K</div></div><div class="card" style="padding:11px;text-align:center"><div style="font-size:22px">🇨🇦</div><div style="font-size:12px;font-weight:700;margin-top:3px">Canadá</div><div style="font-size:10px;color:var(--inkf)">2 clientes</div><div style="font-family:'DM Serif Display',serif;font-size:15px;margin-top:5px">$18K</div></div><div class="card" style="padding:11px;text-align:center"><div style="font-size:22px">🇩🇴</div><div style="font-size:12px;font-weight:700;margin-top:3px">Rep. Dom.</div><div style="font-size:10px;color:var(--inkf)">2 clientes</div><div style="font-family:'DM Serif Display',serif;font-size:15px;margin-top:5px">$9K</div></div><div class="card" style="padding:11px;text-align:center"><div style="font-size:22px">🇪🇨</div><div style="font-size:12px;font-weight:700;margin-top:3px">Ecuador</div><div style="font-size:10px;color:var(--inkf)">0 clientes</div><div style="font-family:'DM Serif Display',serif;font-size:15px;margin-top:5px">—</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       FOUNDERS
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-founders">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Vista Founders — Pimentón Global</div><div class="sec-sub">Juanchi · Tomi · Nacho · Marzo 2026</div></div><button class="bg">Exportar</button></div>
+    <div class="g4" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">Clientes totales</div><div class="stat-v">250+</div><div class="stat-d up">↑ 12 este mes</div></div>
+      <div class="stat"><div class="stat-l">MRR total</div><div class="stat-v">$98K</div><div class="stat-d up">↑ 6.2%</div></div>
+      <div class="stat"><div class="stat-l">Team size</div><div class="stat-v">48</div><div class="stat-d nt">4 regiones activas</div></div>
+      <div class="stat"><div class="stat-l">Churn este mes</div><div class="stat-v" style="color:var(--amber)">2</div><div class="stat-d dn">$780/mes perdido</div></div>
+    </div>
+    <div class="world-g">
+  <div class="world-c">
+<div class="wflag">🇦🇷</div><div class="wname">CHARUY</div>
+<div class="wcm">Gabriel Chaylle · Chile · Argentina · Uruguay · Paraguay</div>
+<div class="wstats">
+<div class="ws"><div class="ws-l">Clientes</div><div class="ws-v">95</div></div>
+<div class="ws"><div class="ws-l">Ventas</div><div class="ws-v" style="font-size:12px">$420K</div></div>
+<div class="ws"><div class="ws-l">Crecim.</div><div class="ws-v" style="color:var(--green);font-size:12px">+11.2%</div></div>
+<div class="ws"><div class="ws-l">En riesgo</div><div class="ws-v" style="color:var(--danger)">8</div></div>
+</div></div><div class="world-c">
+<div class="wflag">🇲🇽</div><div class="wname">MECOPE</div>
+<div class="wcm">Andrés Tolosa · México · Colombia · Perú · Costa Rica</div>
+<div class="wstats">
+<div class="ws"><div class="ws-l">Clientes</div><div class="ws-v">72</div></div>
+<div class="ws"><div class="ws-l">Ventas</div><div class="ws-v" style="font-size:12px">$280K</div></div>
+<div class="ws"><div class="ws-l">Crecim.</div><div class="ws-v" style="color:var(--green);font-size:12px">+7.8%</div></div>
+<div class="ws"><div class="ws-l">En riesgo</div><div class="ws-v" style="color:var(--amber)">5</div></div>
+</div></div><div class="world-c">
+<div class="wflag">🇺🇸</div><div class="wname">USA / CAN / RD</div>
+<div class="wcm">Kevin Ostrovsky · USA · Canadá · Rep. Dom.</div>
+<div class="wstats">
+<div class="ws"><div class="ws-l">Clientes</div><div class="ws-v">24</div></div>
+<div class="ws"><div class="ws-l">Ventas</div><div class="ws-v" style="font-size:12px">$312K</div></div>
+<div class="ws"><div class="ws-l">Crecim.</div><div class="ws-v" style="color:var(--green);font-size:12px">+8.4%</div></div>
+<div class="ws"><div class="ws-l">En riesgo</div><div class="ws-v" style="color:var(--amber)">3</div></div>
+</div></div><div class="world-c">
+<div class="wflag">🇪🇸</div><div class="wname">España</div>
+<div class="wcm">Nacho (directo) · España</div>
+<div class="wstats">
+<div class="ws"><div class="ws-l">Clientes</div><div class="ws-v">14</div></div>
+<div class="ws"><div class="ws-l">Ventas</div><div class="ws-v" style="font-size:12px">$62K</div></div>
+<div class="ws"><div class="ws-l">Crecim.</div><div class="ws-v" style="color:var(--green);font-size:12px">+4.1%</div></div>
+<div class="ws"><div class="ws-l">En riesgo</div><div class="ws-v" style="color:var(--amber)">1</div></div>
+</div></div>
+    </div>
+    <div class="g2">
+      <div>
+        <div class="sec-hdr"><div class="sec-title">Top accounts globales</div></div>
+        <div class="tbl">
+          <div class="th-row" style="grid-template-columns:2fr 80px 80px 68px;"><div class="th">Cliente</div><div class="th">Región</div><div class="th">MRR</div><div class="th">NPS</div></div>
+<div class="tr" style="grid-template-columns:2fr 80px 80px 68px"><div class="cv" style="font-weight:600">Baires Grill</div><div class="cv"><span class="pill pb">USA</span></div><div class="cv" style="font-weight:700">$450</div><div class="cv" style="color:var(--green);font-weight:700">4.5</div></div><div class="tr" style="grid-template-columns:2fr 80px 80px 68px"><div class="cv" style="font-weight:600">Grupo Tacos Don</div><div class="cv"><span class="pill pb">MECOPE</span></div><div class="cv" style="font-weight:700">$380</div><div class="cv" style="color:var(--green);font-weight:700">4.7</div></div><div class="tr" style="grid-template-columns:2fr 80px 80px 68px"><div class="cv" style="font-weight:600">Criollas</div><div class="cv"><span class="pill pb">CHARUY</span></div><div class="cv" style="font-weight:700">$320</div><div class="cv" style="color:var(--green);font-weight:700">4.8</div></div><div class="tr" style="grid-template-columns:2fr 80px 80px 68px"><div class="cv" style="font-weight:600">Narbona</div><div class="cv"><span class="pill pb">CHARUY</span></div><div class="cv" style="font-weight:700">$290</div><div class="cv" style="color:var(--green);font-weight:700">4.6</div></div><div class="tr" style="grid-template-columns:2fr 80px 80px 68px"><div class="cv" style="font-weight:600">Sushimas</div><div class="cv"><span class="pill pb">USA</span></div><div class="cv" style="font-weight:700">$280</div><div class="cv" style="color:var(--green);font-weight:700">4.7</div></div><div class="tr" style="grid-template-columns:2fr 80px 80px 68px"><div class="cv" style="font-weight:600">Pizza Roma</div><div class="cv"><span class="pill pb">CHARUY</span></div><div class="cv" style="font-weight:700">$260</div><div class="cv" style="color:var(--green);font-weight:700">4.5</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-hdr"><div class="sec-title">Worst offenders — acción urgente</div></div>
+        <div class="tbl">
+          <div class="th-row" style="grid-template-columns:2fr 72px 100px;"><div class="th">Cliente</div><div class="th">Score</div><div class="th">Principal alerta</div></div>
+<div class="tr" style="grid-template-columns:2fr 72px 100px"><div class="cv" style="font-weight:600">Baires Grill – Doral</div><div class="cv" style="color:var(--danger);font-weight:700">42/100</div><div class="cv" style="font-size:10.5px;color:var(--inkl)">Ventas −18.8%</div></div><div class="tr" style="grid-template-columns:2fr 72px 100px"><div class="cv" style="font-weight:600">Negroni</div><div class="cv" style="color:var(--danger);font-weight:700">51/100</div><div class="cv" style="font-size:10.5px;color:var(--inkl)">Cancelac. 4.8%</div></div><div class="tr" style="grid-template-columns:2fr 72px 100px"><div class="cv" style="font-weight:600">El Burrito Loco</div><div class="cv" style="color:var(--danger);font-weight:700">48/100</div><div class="cv" style="font-size:10.5px;color:var(--inkl)">NPS 3.9</div></div><div class="tr" style="grid-template-columns:2fr 72px 100px"><div class="cv" style="font-weight:600">La Bodega</div><div class="cv" style="color:var(--danger);font-weight:700">55/100</div><div class="cv" style="font-size:10.5px;color:var(--inkl)">Conv. 8.2%</div></div><div class="tr" style="grid-template-columns:2fr 72px 100px"><div class="cv" style="font-weight:600">Taco Palace</div><div class="cv" style="color:var(--danger);font-weight:700">58/100</div><div class="cv" style="font-size:10.5px;color:var(--inkl)">Recompra 28%</div></div><div class="tr" style="grid-template-columns:2fr 72px 100px"><div class="cv" style="font-weight:600">Wing Stop Col.</div><div class="cv" style="color:var(--danger);font-weight:700">60/100</div><div class="cv" style="font-size:10.5px;color:var(--inkl)">NPS bajó −0.4</div></div>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="sec-title" style="margin-bottom:9px;font-size:14px;">MRR por región</div>
+          <div class="card" style="padding:13px;">
+<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>CHARUY</span><span style="font-weight:700">$42K (43%)</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:98%;height:100%;background:var(--blue);border-radius:4px"></div></div></div><div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>USA/CAN/RD</span><span style="font-weight:700">$31K (32%)</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:73%;height:100%;background:var(--red);border-radius:4px"></div></div></div><div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>MECOPE</span><span style="font-weight:700">$18K (18%)</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:41%;height:100%;background:var(--green);border-radius:4px"></div></div></div><div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>España</span><span style="font-weight:700">$7K (7%)</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:16%;height:100%;background:var(--amber);border-radius:4px"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       EQUIPO
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-equipo">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Equipo — USA / CAN / RD</div><div class="sec-sub">Kevin Ostrovsky · Country Manager</div></div><button class="bg">Ver todas las regiones</button></div>
+    <div class="team-g">
+<div class="team-c">
+<div class="team-av" style="background:var(--red)">KO</div>
+<div class="team-name">Kevin Ostrovsky</div>
+<div class="team-role">Country Manager · USA/CAN/RD</div>
+<div style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--bbg);color:var(--blue);margin-bottom:6px">USA/CAN/RD</div>
+<div class="team-stats">
+<div><div class="ts-l">Clientes</div><div class="ts-v">—</div></div>
+<div><div class="ts-l">Tareas</div><div class="ts-v">12</div></div>
+<div><div class="ts-l">NPS prom.</div><div class="ts-v" style="font-size:13px">—</div></div>
+<div><div class="ts-l">Ventas</div><div class="ts-v" style="font-size:12px">—</div></div>
+</div></div><div class="team-c">
+<div class="team-av" style="background:var(--blue)">FD</div>
+<div class="team-name">Franco DiFabio</div>
+<div class="team-role">Growth Manager Sr · USA</div>
+<div style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--bbg);color:var(--blue);margin-bottom:6px">USA</div>
+<div class="team-stats">
+<div><div class="ts-l">Clientes</div><div class="ts-v">8</div></div>
+<div><div class="ts-l">Tareas</div><div class="ts-v">5</div></div>
+<div><div class="ts-l">NPS prom.</div><div class="ts-v" style="font-size:13px">4.5</div></div>
+<div><div class="ts-l">Ventas</div><div class="ts-v" style="font-size:12px">$124K</div></div>
+</div></div><div class="team-c">
+<div class="team-av" style="background:var(--blue)">DM</div>
+<div class="team-name">Daniel Morán</div>
+<div class="team-role">Growth Manager Sr · USA</div>
+<div style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--bbg);color:var(--blue);margin-bottom:6px">USA</div>
+<div class="team-stats">
+<div><div class="ts-l">Clientes</div><div class="ts-v">7</div></div>
+<div><div class="ts-l">Tareas</div><div class="ts-v">4</div></div>
+<div><div class="ts-l">NPS prom.</div><div class="ts-v" style="font-size:13px">4.6</div></div>
+<div><div class="ts-l">Ventas</div><div class="ts-v" style="font-size:12px">$98K</div></div>
+</div></div><div class="team-c">
+<div class="team-av" style="background:var(--green)">DB</div>
+<div class="team-name">Daniella Bayona</div>
+<div class="team-role">Growth Manager · USA</div>
+<div style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--bbg);color:var(--blue);margin-bottom:6px">USA</div>
+<div class="team-stats">
+<div><div class="ts-l">Clientes</div><div class="ts-v">6</div></div>
+<div><div class="ts-l">Tareas</div><div class="ts-v">6</div></div>
+<div><div class="ts-l">NPS prom.</div><div class="ts-v" style="font-size:13px">4.7</div></div>
+<div><div class="ts-l">Ventas</div><div class="ts-v" style="font-size:12px">$56K</div></div>
+</div></div><div class="team-c">
+<div class="team-av" style="background:var(--amber)">MC</div>
+<div class="team-name">Martín Camacho</div>
+<div class="team-role">Growth Manager · RD</div>
+<div style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--bbg);color:var(--blue);margin-bottom:6px">RD</div>
+<div class="team-stats">
+<div><div class="ts-l">Clientes</div><div class="ts-v">5</div></div>
+<div><div class="ts-l">Tareas</div><div class="ts-v">3</div></div>
+<div><div class="ts-l">NPS prom.</div><div class="ts-v" style="font-size:13px">4.4</div></div>
+<div><div class="ts-l">Ventas</div><div class="ts-v" style="font-size:12px">$22K</div></div>
+</div></div><div class="team-c">
+<div class="team-av" style="background:var(--inkf)">NL</div>
+<div class="team-name">Nicolas Lopez</div>
+<div class="team-role">Customer Success · USA</div>
+<div style="display:inline-block;padding:1px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--bbg);color:var(--blue);margin-bottom:6px">USA</div>
+<div class="team-stats">
+<div><div class="ts-l">Clientes</div><div class="ts-v">14</div></div>
+<div><div class="ts-l">Tareas</div><div class="ts-v">8</div></div>
+<div><div class="ts-l">NPS prom.</div><div class="ts-v" style="font-size:13px">—</div></div>
+<div><div class="ts-l">Ventas</div><div class="ts-v" style="font-size:12px">—</div></div>
+</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       VENTAS / CRM
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-ventas">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Ventas / CRM</div><div class="sec-sub">Pipeline · Nacho Aranciaga</div></div><button class="bp">+ Nuevo prospecto</button></div>
+    <div class="g4" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">En pipeline</div><div class="stat-v">18</div><div class="stat-d nt">4 etapas</div></div>
+      <div class="stat"><div class="stat-l">MRR potencial</div><div class="stat-v">$7.2K</div><div class="stat-d up">Si cierran todos</div></div>
+      <div class="stat"><div class="stat-l">Cerrados este mes</div><div class="stat-v" style="color:var(--green)">3</div><div class="stat-d up">$1.2K MRR nuevo</div></div>
+      <div class="stat"><div class="stat-l">Tasa de cierre</div><div class="stat-v">34%</div><div class="stat-d nt">Promedio histórico</div></div>
+    </div>
+    <div class="pipeline">
+<div class="pipe-col" style="background:var(--bbg)"><div class="pipe-col-title">Contacto inicial<span class="pipe-count">7</span></div><div class="pipe-card"><div class="pipe-cn">Burger Factory Miami</div><div class="pipe-cm">🇺🇸 USA</div><div class="pipe-val">$350/mes</div></div><div class="pipe-card"><div class="pipe-cn">Green Bowl LA</div><div class="pipe-cm">🇺🇸 USA</div><div class="pipe-val">$280/mes</div></div><div class="pipe-card"><div class="pipe-cn">Pasta Mia NYC</div><div class="pipe-cm">🇺🇸 USA</div><div class="pipe-val">$420/mes</div></div></div><div class="pipe-col" style="background:var(--abg)"><div class="pipe-col-title">Demo enviada<span class="pipe-count">5</span></div><div class="pipe-card"><div class="pipe-cn">Sushi Palace Madrid</div><div class="pipe-cm">🇪🇸 España</div><div class="pipe-val">$380/mes</div></div><div class="pipe-card"><div class="pipe-cn">Taco Bueno MX</div><div class="pipe-cm">🇲🇽 México</div><div class="pipe-val">$290/mes</div></div></div><div class="pipe-col" style="background:var(--gbg)"><div class="pipe-col-title">Propuesta<span class="pipe-count">4</span></div><div class="pipe-card"><div class="pipe-cn">La Parrilla BA</div><div class="pipe-cm">🇦🇷 Argentina</div><div class="pipe-val">$450/mes</div></div><div class="pipe-card"><div class="pipe-cn">Wing Stop Colombia</div><div class="pipe-cm">🇨🇴 Colombia</div><div class="pipe-val">$320/mes</div></div></div><div class="pipe-col" style="background:var(--dbg)"><div class="pipe-col-title">Negociación<span class="pipe-count">2</span></div><div class="pipe-card"><div class="pipe-cn">Big Burger Chile</div><div class="pipe-cm">🇨🇱 Chile</div><div class="pipe-val">$400/mes</div></div><div class="pipe-card"><div class="pipe-cn">Pizza Roma Miami</div><div class="pipe-cm">🇺🇸 USA</div><div class="pipe-val">$380/mes</div></div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       FINANZAS
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-finanzas">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Finanzas y Comisiones</div><div class="sec-sub">Belén Benavidez · Founders · Febrero 2026</div></div><button class="bg">Exportar</button></div>
+    <div class="g4" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">MRR Total</div><div class="stat-v">$98K</div><div class="stat-d up">↑ 6.2%</div></div>
+      <div class="stat"><div class="stat-l">Clientes activos</div><div class="stat-v">250</div><div class="stat-d up">↑ 12 este mes</div></div>
+      <div class="stat"><div class="stat-l">Ticket prom. cliente</div><div class="stat-v">$392</div><div class="stat-d nt">↔ estable</div></div>
+      <div class="stat"><div class="stat-l">Churn MRR</div><div class="stat-v" style="color:var(--amber)">$780</div><div class="stat-d dn">2 clientes perdidos</div></div>
+    </div>
+    <div class="g2">
+      <div>
+        <div class="sec-hdr"><div class="sec-title">Facturación por cliente (USA)</div></div>
+        <div class="card" style="overflow:hidden;">
+          <table class="fin-t">
+            <thead><tr><th>Cliente</th><th>Plan</th><th>MRR</th><th>Renovación</th><th>Estado</th></tr></thead>
+<tbody><tr><td style="font-weight:600">Baires Grill</td><td><span class="pill pb">Premium</span></td><td style="font-weight:700">$450</td><td style="font-size:11px">Ene 2027</td><td style="color:var(--green);font-weight:600">Al día</td></tr><tr><td style="font-weight:600">Paperfish SB</td><td><span class="pill pg">Core</span></td><td style="font-weight:700">$380</td><td style="font-size:11px">Mar 2026</td><td style="color:var(--green);font-weight:600">Al día</td></tr><tr><td style="font-weight:600">Sushimas</td><td><span class="pill pg">Core</span></td><td style="font-weight:700">$350</td><td style="font-size:11px">Jun 2026</td><td style="color:var(--green);font-weight:600">Al día</td></tr><tr><td style="font-weight:600">Negroni</td><td><span class="pill pg">Core</span></td><td style="font-weight:700">$320</td><td style="font-size:11px">Abr 2026</td><td style="color:var(--green);font-weight:600">Al día</td></tr><tr><td style="font-weight:600">La Mezzetta</td><td><span class="pill pa">Small</span></td><td style="font-weight:700">$280</td><td style="font-size:11px">Mar 2027</td><td style="color:var(--green);font-weight:600">Al día</td></tr><tr><td style="font-weight:600">Wok Palace</td><td><span class="pill pa">Small</span></td><td style="font-weight:700">$250</td><td style="font-size:11px">Jul 2026</td><td style="color:var(--green);font-weight:600">Al día</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;">
+        <div>
+          <div class="sec-hdr"><div class="sec-title">Comisiones del equipo</div></div>
+          <div class="card" style="padding:13px;">
+            <div style="font-size:11px;color:var(--inkl);margin-bottom:11px;">% sobre cartera asignada · Febrero 2026</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--sand)"><div><div style="font-size:12px;font-weight:600">Franco DiFabio</div><div style="font-size:10px;color:var(--inkf)">GM Sr · $124K cartera</div></div><div style="font-size:13px;font-weight:700;color:var(--green)">$3,720</div></div><div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--sand)"><div><div style="font-size:12px;font-weight:600">Daniel Morán</div><div style="font-size:10px;color:var(--inkf)">GM Sr · $98K cartera</div></div><div style="font-size:13px;font-weight:700;color:var(--green)">$2,940</div></div><div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--sand)"><div><div style="font-size:12px;font-weight:600">Daniella Bayona</div><div style="font-size:10px;color:var(--inkf)">GM · $56K cartera</div></div><div style="font-size:13px;font-weight:700;color:var(--green)">$1,120</div></div><div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--sand)"><div><div style="font-size:12px;font-weight:600">Martín Camacho</div><div style="font-size:10px;color:var(--inkf)">GM · $22K cartera</div></div><div style="font-size:13px;font-weight:700;color:var(--green)">$440</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-title" style="margin-bottom:9px;">MRR por plan</div>
+          <div class="card" style="padding:13px;">
+<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Premium (5 clientes)</span><span style="font-weight:700">$2,250</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:99%;height:100%;background:var(--blue);border-radius:4px"></div></div></div><div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Core (180 clientes)</span><span style="font-weight:700">$68,400</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:81%;height:100%;background:var(--green);border-radius:4px"></div></div></div><div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span>Small (65 clientes)</span><span style="font-weight:700">$16,250</span></div><div style="height:8px;background:var(--sand);border-radius:4px;overflow:hidden"><div style="width:39%;height:100%;background:var(--amber);border-radius:4px"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ACADEMIA
+  ══════════════════════════════════════════════ -->
+  <div class="page" id="p-academia">
+    <div class="sec-hdr" style="margin-bottom:13px;"><div><div class="sec-title">Academia Pimentón</div><div class="sec-sub">Base de conocimiento · Gisela Sisca / Tomi</div></div><button class="bp">+ Nuevo recurso</button></div>
+    <div class="g3" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-l">Recursos disponibles</div><div class="stat-v">24</div><div class="stat-d up">↑ 3 este mes</div></div>
+      <div class="stat"><div class="stat-l">GMs en formación</div><div class="stat-v">2</div><div class="stat-d nt">Semana 1 de academia</div></div>
+      <div class="stat"><div class="stat-l">Completaron academia</div><div class="stat-v" style="color:var(--green)">31</div><div class="stat-d up">Del total del equipo</div></div>
+    </div>
+    <div class="ac-g">
+<div class="ac-c"><div class="ac-banner" style="background:var(--sand)">🎯</div><div class="ac-body"><div class="ac-t">Optimización de Menú</div><div class="ac-s">Guía completa: fotos, nombres, categorías, combos y pricing estratégico</div><div class="ac-tag" style="background:var(--bbg);color:var(--blue)">Operaciones</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">📊</div><div class="ac-body"><div class="ac-t">Cómo leer los datos en Looker</div><div class="ac-s">Tutorial para interpretar métricas y detectar oportunidades de crecimiento</div><div class="ac-tag" style="background:var(--gbg);color:var(--green)">Data</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">🚀</div><div class="ac-body"><div class="ac-t">Onboarding de nuevos clientes</div><div class="ac-s">El proceso completo de 6 pasos para incorporar un cliente desde cero</div><div class="ac-tag" style="background:var(--abg);color:var(--amber)">Proceso</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">💬</div><div class="ac-body"><div class="ac-t">Cómo escribir un buen reporte</div><div class="ac-s">Comunicación efectiva: reportes semanales, operativos y mensuales</div><div class="ac-tag" style="background:var(--sand);color:var(--inkl)">Comunicación</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">⚡</div><div class="ac-body"><div class="ac-t">Diagnóstico rápido — método Pimentón</div><div class="ac-s">El proceso de 3 minutos para detectar y priorizar problemas en un cliente</div><div class="ac-tag" style="background:var(--dbg);color:var(--danger)">Estrategia</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">🎯</div><div class="ac-body"><div class="ac-t">Algoritmos de las food apps</div><div class="ac-s">Cómo funciona el ranking en Uber Eats, Rappi, PedidosYa y Glovo</div><div class="ac-tag" style="background:var(--bbg);color:var(--blue)">Apps</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">💰</div><div class="ac-body"><div class="ac-t">Campañas y ADS — guía completa</div><div class="ac-s">BOGO, free delivery, porcentajes, ads dentro de apps: cuándo usar cada uno</div><div class="ac-tag" style="background:var(--gbg);color:var(--green)">Campañas</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">📸</div><div class="ac-body"><div class="ac-t">Fotografía de menú para delivery</div><div class="ac-s">Estándares Pimentón para fotos que convierten: encuadre, luz y presentación</div><div class="ac-tag" style="background:var(--abg);color:var(--amber)">Menú</div></div></div><div class="ac-c"><div class="ac-banner" style="background:var(--sand)">🌶️</div><div class="ac-body"><div class="ac-t">Valores y cultura Pimentón</div><div class="ac-s">Pensar en grande · Curiosidad · Adaptabilidad · Protagonismo · Respeto</div><div class="ac-tag" style="background:var(--dbg);color:var(--danger)">Cultura</div></div></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+</div><!-- /app -->
+
+<script>
+// ── DATA ──
+const clients = [
+  {n:'Baires Grill – Doral',a:'Uber Eats · 8 suc.',s:'red',nps:'4.2',conv:'12.25%',v:'$14.0K',d:-18.8,t:3,c:'#C42E1A'},
+  {n:'Negroni',a:'Rappi · 2 suc.',s:'red',nps:'4.5',conv:'15%',v:'$32.1K',d:-6.2,t:2,c:'#C42E1A'},
+  {n:'Paperfish – South Beach',a:'Uber Eats · 2 suc.',s:'amber',nps:'4.4',conv:'12%',v:'$26.4K',d:-1.3,t:2,c:'#D4860A'},
+  {n:'Baires Grill – Brickell',a:'Uber Eats · 1 suc.',s:'green',nps:'4.6',conv:'20.75%',v:'$74.9K',d:4.4,t:1,c:'#2D9E6B'},
+  {n:'Sushimas',a:'Rappi · 3 suc.',s:'green',nps:'4.7',conv:'18%',v:'$48.2K',d:12.1,t:0,c:'#2D9E6B'},
+  {n:'Baires Grill – Weston',a:'Uber Eats · 1 suc.',s:'green',nps:'4.6',conv:'16%',v:'$32.0K',d:16.8,t:1,c:'#2D9E6B'},
+  {n:'La Mezzetta Miami',a:'Uber Eats · 1 suc.',s:'green',nps:'4.8',conv:'19%',v:'$21.0K',d:8.2,t:1,c:'#2D6ECC'},
+  {n:'Wok Palace',a:'Rappi · PedidosYa · 2 suc.',s:'green',nps:'4.5',conv:'14.2%',v:'$18.5K',d:3.1,t:1,c:'#2D6ECC'},
+];
+
+const tasks = [
+  {n:'Auto pedidos diarios — Doral',cl:'Baires Grill',due:'Hoy',p:'h',done:false,type:'Operación'},
+  {n:'Escalar cancelaciones al restaurant',cl:'Negroni',due:'Hoy',p:'h',done:false,type:'Operación'},
+  {n:'Revisar reseñas negativas Doral',cl:'Baires Grill',due:'Hoy',p:'m',done:false,type:'NPS'},
+  {n:'Activar link UE en Instagram',cl:'Paperfish SB',due:'Mar 08',p:'m',done:false,type:'Campaña'},
+  {n:'Benchmark Orlando',cl:'Baires Grill',due:'Mar 06',p:'m',done:false,type:'Análisis'},
+  {n:'Potenciar FL / Coral Gables',cl:'Baires Grill',due:'Mar 09',p:'m',done:false,type:'Estrategia'},
+  {n:'Reporte operaciones miércoles',cl:'Baires Grill',due:'Mar 11',p:'m',done:false,type:'Reporte'},
+  {n:'Revisar campañas BOGO enero',cl:'Baires Grill',due:'Mar 12',p:'l',done:true,type:'Campaña'},
+];
+
+// ── RENDER FUNCTIONS ──
+function clientRow(c) {
+  const sc=c.s==='red'?'pr':c.s==='amber'?'pa':'pg';
+  const sl=c.s==='red'?'En riesgo':c.s==='amber'?'Atención':'OK';
+  const dc=c.d>0?'up':'dn';
+  return `<div class="tr cols7">
+    <div style="display:flex;align-items:center;gap:7px;"><div class="av" style="background:${c.c};">${c.n.slice(0,2).toUpperCase()}</div><div><div class="cn">${c.n}</div><div class="cs">${c.a}</div></div></div>
+    <div><span class="pill ${sc}">${sl}</span></div>
+    <div class="cv">${c.nps}</div>
+    <div class="cv">${c.conv}</div>
+    <div class="cv">${c.v}</div>
+    <div class="cv ${dc}" style="font-weight:700;">${c.d>0?'+':''}${c.d}%</div>
+    <div class="cv">${c.t} tareas</div>
+  </div>`;
+}
+
+function taskHTML(t,i) {
+  const dc=t.due==='Hoy'?'hot':t.due==='Mar 06'?'late':'';
+  const pc=t.p==='h'?'ph':t.p==='m'?'pm':'pl';
+  const pl=t.p==='h'?'Alta':t.p==='m'?'Media':'Baja';
+  return `<div class="ti">
+    <div class="tc ${t.done?'done':''}" onclick="toggleT(${i})">${t.done?'✓':''}</div>
+    <div style="flex:1;min-width:0;">
+      <div class="tn ${t.done?'done':''}">${t.n}</div>
+      <div class="tm"><span class="tt">${t.type}</span>${t.cl?`<span class="tt" style="color:var(--inkf);">${t.cl}</span>`:''}<span class="td ${dc}">${t.due}</span></div>
+    </div>
+    <span class="pt ${pc}">${pl}</span>
+  </div>`;
+}
+
+function render() {
+  const rows = clients.map(clientRow).join('');
+  document.getElementById('dash-clients').innerHTML = rows;
+  document.getElementById('all-clients').innerHTML = rows;
+  const today = tasks.filter(t=>!t.done||t.due==='Hoy').slice(0,5);
+  document.getElementById('dash-tasks').innerHTML = today.map((t,i)=>taskHTML(t,i)).join('');
+  document.getElementById('all-tasks').innerHTML = tasks.map((t,i)=>taskHTML(t,i)).join('');
+}
+
+function toggleT(i) { tasks[i].done=!tasks[i].done; render(); }
+
+function addTask() {
+  const v = document.getElementById('gti').value.trim();
+  if(!v) return;
+  tasks.unshift({n:v,cl:'',due:'Sin fecha',p:'m',done:false,type:'Otro'});
+  document.getElementById('gti').value='';
+  render();
+}
+
+function filterC(el,f) {
+  document.querySelectorAll('.fc').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  const filtered=f==='all'?clients:clients.filter(c=>(f==='red'&&c.s==='red')||(f==='amber'&&c.s==='amber')||(f==='green'&&c.s==='green'));
+  document.getElementById('all-clients').innerHTML=filtered.map(clientRow).join('');
+}
+
+// ── NAV ──
+const META = {
+  dashboard:{t:'Mi Dashboard',c:'Semana 10 · Marzo 2026',p:'+ Nueva tarea',g:''},
+  clientes:{t:'Mis Clientes',c:'24 activos · USA',p:'+ Nuevo cliente',g:''},
+  tareas:{t:'Mis Tareas',c:'8 pendientes · 2 vencidas',p:'+ Nueva tarea',g:''},
+  alertas:{t:'Alertas',c:'3 activas · actualiza cada 4h',p:'',g:'⚙ Configurar'},
+  'rep-semanal':{t:'Reporte Semanal',c:'Para WhatsApp',p:'⬇ PDF',g:''},
+  'rep-ops':{t:'Reporte Operaciones',c:'Miércoles / Jueves',p:'⬇ PDF',g:''},
+  'rep-mensual':{t:'Reporte Mensual',c:'Informe completo',p:'⬇ PDF',g:''},
+  metricas:{t:'Métricas',c:'BigQuery · Looker Studio',p:'',g:'Exportar'},
+  diagnostico:{t:'Diagnóstico Automático',c:'Análisis IA · actualizado hace 2h',p:'⚡ Re-analizar',g:''},
+  campanas:{t:'Campañas',c:'6 activas · 1 pausada',p:'+ Nueva campaña',g:''},
+  onboarding:{t:'Onboarding',c:'3 en proceso',p:'+ Nuevo onboarding',g:''},
+  country:{t:'Vista Country Manager',c:'USA / CAN / RD',p:'',g:''},
+  founders:{t:'Vista Founders',c:'Pimentón Global · Marzo 2026',p:'',g:'Exportar'},
+  equipo:{t:'Equipo',c:'USA / CAN / RD',p:'',g:'Ver todas las regiones'},
+  ventas:{t:'Ventas / CRM',c:'Pipeline · Nacho Aranciaga',p:'+ Nuevo prospecto',g:''},
+  finanzas:{t:'Finanzas y Comisiones',c:'Belén Benavidez · Febrero 2026',p:'',g:'Exportar'},
+  academia:{t:'Academia Pimentón',c:'24 recursos · Gisela / Tomi',p:'+ Nuevo recurso',g:''},
+};
+
+function go(el,id) {
+  document.querySelectorAll('.sb-a').forEach(a=>a.classList.remove('on'));
+  if(el) el.classList.add('on');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  const pg=document.getElementById('p-'+id);
+  if(pg) pg.classList.add('on');
+  const m=META[id]||{t:id,c:'',p:'',g:''};
+  const tbTitle=document.getElementById('tbTitle'); if(tbTitle) tbTitle.textContent=m.t;
+  const tbChip=document.getElementById('tbChip');   if(tbChip)  tbChip.textContent=m.c;
+  const bp=document.getElementById('tbP'); if(bp){bp.textContent=m.p; bp.style.display=m.p?'flex':'none';}
+  const bg=document.getElementById('tbG'); if(bg){bg.textContent=m.g; bg.style.display=m.g?'flex':'none';}
+  const main=document.querySelector('.main'); if(main) main.scrollTo(0,0);
+}
+
+function cpyWA() {
+  const t=document.getElementById('wab').textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    const b=document.getElementById('cpyBtn');
+    b.textContent='✓ Copiado!'; b.style.background='var(--green)';
+    setTimeout(()=>{b.textContent='📋 Copiar WhatsApp';b.style.background='var(--blue)'},2200);
+  });
+}
+
+function setLang(el) {
+  el.closest('.tgl-g').querySelectorAll('.tgl').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+}
+
+render();
+
+// ═══════════════════════════════════════════════════════
+// CLIENTES POR GM — para dropdowns de reportes
+// ═══════════════════════════════════════════════════════
+const GM_CLIENTES = {
+  'Kevin Ostrovsky':  ['Baires Grill','Paperfish South Beach','Sushimas','Negroni','La Mezzetta Miami','Wok Palace','Fridas','Santo Pecado','Caja China','El Portal'],
+  'Franco DiFabio':   ['Green Leaf Doral','Tacos El Rey','Miami Spice','Burger Republic','Poke House Aventura','Café La Palma'],
+  'Daniel Morán':     ['Suviche Group','Casa Lola','Cevichería La Mar','El Rincón Cubano','Patagonia Grill','Havana 1957'],
+  'Daniella Bayona':  ['Tortilla Madre','Taco Bell Coconut Grove','Empanadas El Hornito','Don Taco','Arepa Zone','Cachapas & Co'],
+  'Sofia Buscio':     ['Santo Bar','La Cabrera','El Federal','Don Julio','Gran Dabbang','Proper Buenos Aires'],
+  'Martin Camacho':   ['Roji Fast','El Mesón','La Preferida','Comedor Lucerna','Taquería El Califa'],
+  'Katiuska Infante': ['Barbillón','Larrumbe','El Jardín de los Milagros','La Taberna del Alabardero','Fismuler'],
+  'Gabriel Chaylle':  ['El Mercado','La Forchetta','Baires Café','Comidas de Mamá','Don Pollo'],
+  'Andrés Tolosa':    ['Crepes & Waffles','El Corral','Andrés DC','Masa','Sipote Burrito'],
+  'Nicolas López':    ['Tacos Villa Corona','El Pescador','La Paloma','Birriería Jalisco'],
+};
+
+function populateClientSelect(gmId, clientSelectId, subId) {
+  const gm = document.getElementById(gmId)?.value;
+  const sel = document.getElementById(clientSelectId);
+  const sub = document.getElementById(subId);
+  if(!sel) return;
+  const clients = GM_CLIENTES[gm] || [];
+  if(!clients.length) { sel.innerHTML = '<option>— Primero elegí el GM —</option>'; return; }
+  sel.innerHTML = clients.map(c => `<option>${c}</option>`).join('');
+  if(sub) sub.textContent = `${gm} · ${clients.length} clientes`;
+}
+
+function rsLoadClients() { populateClientSelect('rs-gm','rs-cliente','rs-sub'); }
+function roLoadClients() { populateClientSelect('ro-gm','ro-cliente','ro-sub'); }
+function rmLoadClients() { populateClientSelect('rm-gm','rm-cliente','rm-sub'); }
+
+// ═══════════════════════════════════════════════════════
+// GENERADOR DE REPORTES (Semanal, Ops, Mensual)
+// ═══════════════════════════════════════════════════════
+let metPeriod = 'weekly';
+let metData = null;
+
+function setMetTab(el, period) {
+  document.querySelectorAll('.met-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  metPeriod = period;
+}
+
+async function generarReporte(tipo) {
+  const cfg = {
+    semanal: { gm:'rs-gm', cl:'rs-cliente', per:'rs-periodo', btn:'rs-btn', prev:'rs-preview', table:'Op_Weekly_db', label:'Reporte Semanal' },
+    ops:     { gm:'ro-gm', cl:'ro-cliente', per:'ro-periodo', btn:'ro-btn', prev:'ro-preview', table:'Op_Weekly_db', label:'Reporte Operaciones' },
+    mensual: { gm:'rm-gm', cl:'rm-cliente', per:'rm-mes',     btn:'rm-btn', prev:'rm-preview', table:'Op_Monthly_db', label:'MBR' },
+  }[tipo];
+
+  const gm      = document.getElementById(cfg.gm)?.value || '';
+  const cliente = document.getElementById(cfg.cl)?.value || '';
+  const periodo = document.getElementById(cfg.per)?.value || '';
+  const btn     = document.getElementById(cfg.btn);
+  const preview = document.getElementById(cfg.prev);
+
+  if(!gm || !cliente) {
+    preview.innerHTML = `<div style="padding:30px;text-align:center;color:var(--danger);font-size:12px;">⚠️ Seleccioná un GM y un cliente primero.</div>`;
+    return;
+  }
+
+  btn.textContent = '⏳ Generando...';
+  btn.disabled = true;
+  preview.innerHTML = `<div style="padding:50px;text-align:center;"><div style="width:24px;height:24px;border:2px solid var(--sand2);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div><div style="font-size:11px;color:var(--inkf);">Consultando BigQuery · ${cfg.table}...</div></div>`;
+
+  const tiposPrompt = {
+    semanal: `Genera un reporte SEMANAL completo para WhatsApp. Incluye: resumen de ventas de la semana, tabla por sucursal con ventas/pedidos/delta%, análisis del GM editable, preview WhatsApp formateado con emojis, y próximos pasos.`,
+    ops: `Genera un reporte de OPERACIONES. Incluye: KPIs operativos (NPS, cancelaciones, disponibilidad, demoras, conversión, recompra), tabla por sucursal con colores según umbral, análisis operativo editable con alertas específicas.`,
+    mensual: `Genera un MBR (Monthly Business Review) completo. Incluye: P&L del mes, tendencia de ventas de los últimos 5 meses con un gráfico de barras, NPS histórico por sucursal, operaciones del mes, análisis ejecutivo editable y próximos pasos para el mes que viene.`,
+  }[tipo];
+
+  const prompt = `Eres el generador de reportes de Pimentón OS. Genera el reporte en HTML usando EXACTAMENTE estas clases CSS que ya existen en la página: rp-hdr, rp-body, rp-gen, rp-gen-sec, rp-gen-title, rp-stat-row, rp-stat-mini, rt (tabla), wa-gen (para WhatsApp), ae (area editable con contenteditable="true"), ns-list, up/dn/nt (colores delta), ru/rd2 (tabla colores).
+
+Datos del contexto:
+- Cliente: ${cliente}
+- Growth Manager: ${gm}
+- Período: ${periodo}
+- Tipo: ${cfg.label}
+- Tabla BigQuery usada: iron-bedrock-432920-d0.Sales.${cfg.table}
+
+Clientes reales de Pimentón (usa contexto): los datos vienen de Op_Weekly_db (campos: Marca, Sucursal, Growth_Manager, Semana, Ordenes, Ventas, NPS, Ordenes_Canceladas, Disponibilidad, Conversion, Recompra, Clientes_Nuevos, Clientes_Recurrentes, Tiempo_de_Preparacion).
+
+${tiposPrompt}
+
+Genera datos REALISTAS y coherentes para "${cliente}" con 4-8 sucursales. El HTML debe empezar con <div class="rp-hdr"> y ser completo y funcional. Incluí el botón de copiar WhatsApp si aplica. Responde SOLO el HTML sin markdown.`;
+
+  try {
+    const res = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 3000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let html = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    html = html.replace(/```html\n?/g,'').replace(/```\n?/g,'').trim();
+    preview.innerHTML = html;
+  } catch(e) {
+    preview.innerHTML = `<div style="padding:20px;color:var(--danger);font-size:12px;">Error generando reporte: ${e.message}</div>`;
+  } finally {
+    btn.textContent = '⚡ Generar con IA';
+    btn.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// MÓDULO MÉTRICAS — BIGQUERY REAL
+// ═══════════════════════════════════════════════════════
+let metRawData = [];
+
+function quickMet(type) {
+  const map = {
+    usa:      { pais:'Estados Unidos', app:'', gm:'' },
+    arg:      { pais:'Argentina',      app:'', gm:'' },
+    esp:      { pais:'España',         app:'', gm:'' },
+    ubereats: { pais:'',               app:'Uber Eats', gm:'' },
+    rappi:    { pais:'',               app:'Rappi',     gm:'' },
+    alertas:  { pais:'',               app:'', gm:'' },
+    top:      { pais:'',               app:'', gm:'' },
+  };
+  const f = map[type] || {};
+  if(f.pais !== undefined) document.getElementById('met-pais').value = f.pais;
+  if(f.app  !== undefined) document.getElementById('met-app').value  = f.app;
+  if(f.gm   !== undefined) document.getElementById('met-gm').value   = f.gm;
+  runMetricas();
+}
+
+async function runMetricas() {
+  const pais    = document.getElementById('met-pais').value;
+  const app     = document.getElementById('met-app').value;
+  const gm      = document.getElementById('met-gm').value;
+  const marca   = document.getElementById('met-marca').value;
+  const periodo = document.getElementById('met-periodo').value;
+  const [desde, hasta] = periodo.split('|');
+
+  document.getElementById('met-empty').style.display = 'none';
+  document.getElementById('met-results').style.display = 'none';
+  document.getElementById('met-loading').style.display = 'block';
+
+  const table  = metPeriod === 'monthly' ? 'Op_Monthly_db' : metPeriod === 'daily' ? 'Sales_db' : 'Op_Weekly_db';
+  const period_field = metPeriod === 'monthly' ? 'Mes' : metPeriod === 'daily' ? 'Dia' : 'Semana';
+  document.getElementById('met-loading-q').textContent = `SELECT * FROM Sales.${table} WHERE ${[pais&&'Pais="'+pais+'"', app&&'App="'+app+'"', gm&&'GM="'+gm+'"'].filter(Boolean).join(' AND ')} LIMIT 500...`;
+
+  const filters = [pais&&`País: ${pais}`, app&&`App: ${app}`, gm&&`GM: ${gm}`, marca&&`Marca: ${marca}`, `Período: ${desde} al ${hasta}`, `Granularidad: ${metPeriod}`].filter(Boolean).join(', ');
+
+  const prompt = `Eres el motor de datos de Pimentón OS. Tienes acceso a BigQuery proyecto iron-bedrock-432920-d0, dataset Sales.
+
+Tabla usada: ${table}
+Campos disponibles en Op_Weekly_db/Op_Monthly_db: ID, App, Pais, Marca, Sucursal, Growth_Manager, ${period_field}(DATE), Ordenes, Ventas, NPS, Ordenes_Canceladas, Ordenes_con_Demora, Ordenes_con_Reclamo, Disponibilidad, Tiempo_de_Preparacion, Clientes_Nuevos, Clientes_Recurrentes, Clientes_Totales, Conversion, Recompra, Visitas, Reembolsos, Impresiones.
+Filtros aplicados: ${filters}
+
+Ejemplo de dato real de la tabla: {App:'Pedidos Ya', Pais:'Argentina', Marca:'Santo Bar', Sucursal:'Charcas', Growth_Manager:'Sofia Buscio', Semana:'2025-07-14', Ordenes:12, Ventas:378342.5, NPS:4.3, Conversion:0.1571, Disponibilidad:0.948}
+
+Genera datos JSON REALISTAS que simulen exactamente lo que devolvería BigQuery con esos filtros. Incluye 10-20 sucursales variadas, algunas con alertas.
+
+Responde SOLO con JSON válido (sin markdown):
+{
+  "meta": {"table":"${table}","rows_returned":N,"query_ms":N,"periodo":"${desde} al ${hasta}","filtros":["filtros activos"]},
+  "kpis": {"ventas_total":N,"ordenes_total":N,"nps_promedio":N,"conversion_promedio":N,"recompra_promedio":N,"cancelaciones_promedio":N,"disponibilidad_promedio":N,"clientes_nuevos_total":N,"clientes_recurrentes_total":N,"ticket_promedio":N,"visitas_total":N,"reembolsos_total":N,"delta_ventas":N,"delta_ordenes":N,"delta_nps":N},
+  "sucursales": [{"marca":"","sucursal":"","pais":"","app":"","gm":"","ventas":N,"ordenes":N,"nps":N,"conversion":N,"recompra":N,"cancelaciones":N,"disponibilidad":N,"ticket":N,"status":"ok|warn|alert"}],
+  "por_app": {"NombreApp":{"ventas":N,"ordenes":N,"nps":N,"conversion":N,"sucursales":N}},
+  "insight": "Análisis ejecutivo de 2-3 oraciones mencionando el mejor cliente, el que más preocupa y una recomendación concreta."
+}`;
+
+  try {
+    const res = await fetch('/api/claude', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:4000, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    let txt = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    txt = txt.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const d = JSON.parse(txt);
+    metRawData = d.sucursales || [];
+    renderMetricas(d);
+  } catch(e) {
+    document.getElementById('met-loading').style.display = 'none';
+    document.getElementById('met-empty').style.display = 'block';
+    document.getElementById('met-empty').innerHTML = `<div style="padding:30px;text-align:center;color:var(--danger);font-size:12px;">Error: ${e.message}</div>`;
+  }
+}
+
+function renderMetricas(d) {
+  document.getElementById('met-loading').style.display = 'none';
+  document.getElementById('met-results').style.display = 'block';
+
+  const fm = (n, t) => {
+    if(n==null||isNaN(n)) return '—';
+    if(t==='money') return '$'+(n>=1000000?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1)+'K':n.toFixed(0));
+    if(t==='pct')   return (n*100).toFixed(1)+'%';
+    if(t==='nps')   return n.toFixed(1);
+    if(t==='num')   return n>=1000?(n/1000).toFixed(1)+'K':Math.round(n).toString();
+    return n;
+  };
+  const dlt = (v) => !v ? '' : v>0.02 ? `<span class="up">▲ ${(v*100).toFixed(1)}%</span>` : v<-0.02 ? `<span class="dn">▼ ${(Math.abs(v)*100).toFixed(1)}%</span>` : `<span class="nt">↔</span>`;
+  const k = d.kpis;
+  const kpiList = [
+    {l:'Ventas',        v:fm(k.ventas_total,'money'),   d:dlt(k.delta_ventas),   s: 'neutral'},
+    {l:'Órdenes',       v:fm(k.ordenes_total,'num'),    d:dlt(k.delta_ordenes),  s: 'neutral'},
+    {l:'NPS Promedio',  v:fm(k.nps_promedio,'nps'),     d:dlt(k.delta_nps),      s: k.nps_promedio<4.2?'alert':k.nps_promedio<4.4?'warn':'good'},
+    {l:'Conversión',    v:fm(k.conversion_promedio,'pct'), d:'', s: k.conversion_promedio<0.10?'alert':k.conversion_promedio<0.14?'warn':'good'},
+    {l:'Recompra',      v:fm(k.recompra_promedio,'pct'),   d:'', s: k.recompra_promedio<0.4?'warn':'good'},
+    {l:'Cancelaciones', v:fm(k.cancelaciones_promedio,'pct'), d:'', s: k.cancelaciones_promedio>0.04?'alert':k.cancelaciones_promedio>0.025?'warn':'good'},
+    {l:'Disponibilidad',v:fm(k.disponibilidad_promedio,'pct'), d:'', s: k.disponibilidad_promedio<0.90?'alert':k.disponibilidad_promedio<0.95?'warn':'good'},
+    {l:'Ticket Prom.',  v:fm(k.ticket_promedio,'money'), d:'',  s: 'neutral'},
+  ];
+  document.getElementById('met-kpis').innerHTML = kpiList.map(ki=>`
+    <div class="stat met-kpi-card ${ki.s}" style="cursor:default">
+      <div class="stat-l">${ki.l}</div>
+      <div class="stat-v" style="font-size:22px;${ki.s==='alert'?'color:var(--danger)':ki.s==='warn'?'color:var(--amber)':ki.s==='good'?'color:var(--green)':''}">${ki.v}</div>
+      <div class="stat-d">${ki.d||'&nbsp;'}</div>
+    </div>`).join('');
+
+  // Insight
+  if(d.insight) {
+    document.getElementById('met-insight-box').style.display = 'flex';
+    document.getElementById('met-insight-txt').textContent = d.insight;
+    document.getElementById('met-insight-meta').textContent = `${d.meta.table} · ${d.meta.query_ms}ms · ${new Date().toLocaleTimeString('es-AR')}`;
+  }
+
+  // Tabla
+  const suc = (d.sucursales||[]).sort((a,b)=>b.ventas-a.ventas);
+  document.getElementById('met-row-count').textContent = `${suc.length} sucursales`;
+  document.getElementById('met-thead').innerHTML = `<div class="th">Marca / Sucursal</div><div class="th">App</div><div class="th" style="text-align:right">Ventas</div><div class="th" style="text-align:right">Órdenes</div><div class="th" style="text-align:right">NPS</div><div class="th" style="text-align:right">Conv.</div><div class="th" style="text-align:right">Recompra</div><div class="th" style="text-align:right">Cancel.</div><div class="th" style="text-align:right">Estado</div>`;
+  const stL = {ok:'✓ OK',warn:'⚠ Atención',alert:'✗ Crítico'};
+  const stC = {ok:'var(--green)',warn:'var(--amber)',alert:'var(--danger)'};
+  document.getElementById('met-tbody').innerHTML = suc.map(s=>`
+    <div class="tr" style="grid-template-columns:2fr 80px 60px 65px 68px 68px 68px 70px 75px">
+      <div><div class="cn">${s.marca}</div><div class="cd">${s.sucursal} · ${s.pais}</div></div>
+      <div class="cv"><span style="font-size:9px;background:var(--sand);padding:2px 6px;border-radius:4px">${s.app}</span></div>
+      <div class="cv" style="text-align:right;font-weight:700">${fm(s.ventas,'money')}</div>
+      <div class="cv" style="text-align:right">${fm(s.ordenes,'num')}</div>
+      <div class="cv" style="text-align:right;font-weight:700;color:${s.nps<4.2?'var(--danger)':s.nps<4.4?'var(--amber)':'var(--green)'}">${fm(s.nps,'nps')}</div>
+      <div class="cv" style="text-align:right">${fm(s.conversion,'pct')}</div>
+      <div class="cv" style="text-align:right">${fm(s.recompra,'pct')}</div>
+      <div class="cv" style="text-align:right;color:${s.cancelaciones>0.04?'var(--danger)':s.cancelaciones>0.025?'var(--amber)':'var(--green)'}">${fm(s.cancelaciones,'pct')}</div>
+      <div class="cv" style="text-align:right"><span style="font-size:9px;font-weight:700;color:${stC[s.status]||stC.ok}">${stL[s.status]||'✓ OK'}</span></div>
+    </div>`).join('');
+
+  // Top 5
+  document.getElementById('met-top5').innerHTML = suc.slice(0,5).map((s,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand);font-size:11px;">
+      <span style="color:var(--inkf);min-width:14px;font-weight:700">${i+1}</span>
+      <div style="flex:1"><div style="font-weight:600">${s.marca}</div><div style="font-size:10px;color:var(--inkf)">${s.sucursal}</div></div>
+      <span style="font-weight:700;color:var(--green)">${fm(s.ventas,'money')}</span>
+    </div>`).join('');
+
+  // Bottom (alertas)
+  const alertas = suc.filter(s=>s.status==='alert'||s.status==='warn').sort((a,b)=>a.nps-b.nps).slice(0,5);
+  document.getElementById('met-bottom5').innerHTML = alertas.length ? alertas.map((s,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--sand);font-size:11px;">
+      <span style="color:var(--inkf);min-width:14px">${i+1}</span>
+      <div style="flex:1"><div style="font-weight:600">${s.marca}</div><div style="font-size:10px;color:var(--inkf)">NPS ${fm(s.nps,'nps')} · ${s.status==='alert'?'🔴':'🟡'}</div></div>
+      <span style="font-size:9px;font-weight:700;color:${stC[s.status]}">${stL[s.status]}</span>
+    </div>`).join('') : '<div style="padding:16px;text-align:center;color:var(--green);font-size:11px;">✓ Sin alertas activas</div>';
+
+  // Apps
+  const appColors = {'Uber Eats':'#06C167','Rappi':'#FF441F','Pedidos Ya':'#FFCC00','DoorDash':'#FF3008','Glovo':'#FFC244','iFood':'#EA1D2C','DiDi Food':'#FF6C0E'};
+  const maxV = Math.max(...Object.values(d.por_app||{}).map(a=>a.ventas||0));
+  document.getElementById('met-apps').innerHTML = Object.entries(d.por_app||{}).sort((a,b)=>b[1].ventas-a[1].ventas).map(([name,a])=>`
+    <div class="stat" style="cursor:default">
+      <div class="stat-l" style="display:flex;align-items:center;gap:5px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${appColors[name]||'#888'};display:inline-block"></span>${name}
+      </div>
+      <div class="stat-v" style="font-size:19px">${fm(a.ventas,'money')}</div>
+      <div style="height:3px;background:var(--sand);border-radius:2px;margin:5px 0;overflow:hidden"><div style="width:${maxV>0?Math.round((a.ventas/maxV)*100):0}%;height:100%;background:${appColors[name]||'#888'}"></div></div>
+      <div class="stat-d nt">${a.sucursales} suc · NPS ${fm(a.nps,'nps')}</div>
+    </div>`).join('');
+}
+
+function exportMetCSV() {
+  if(!metRawData.length) return;
+  const h = ['Marca','Sucursal','País','App','GM','Ventas','Órdenes','NPS','Conversión','Recompra','Cancelaciones','Ticket','Estado'];
+  const rows = metRawData.map(r=>[r.marca,r.sucursal,r.pais,r.app,r.gm,r.ventas,r.ordenes,r.nps,r.conversion,r.recompra,r.cancelaciones,r.ticket,r.status]);
+  const csv = [h,...rows].map(r=>r.join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`pimenton_metricas_${new Date().toISOString().slice(0,10)}.csv`});
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// DIAGNÓSTICO AUTOMÁTICO
+// ═══════════════════════════════════════════════════════
+async function runDiagnostico() {
+  const gm   = document.getElementById('diag-gm').value;
+  const mes  = document.getElementById('diag-mes').value;
+  const pais = document.getElementById('diag-pais').value;
+
+  document.getElementById('diag-loading').style.display = 'block';
+  document.getElementById('diag-list').innerHTML = '';
+
+  const prompt = `Eres el motor de diagnóstico de Pimentón OS. Analiza una cartera de clientes usando datos de BigQuery iron-bedrock-432920-d0.Sales.Op_Monthly_db.
+
+Contexto de la consulta:
+- Growth Manager: ${gm || 'Toda la empresa'}
+- Mes: ${mes}
+- País: ${pais || 'Todos'}
+- Tabla: Op_Monthly_db (campos: Marca, Sucursal, Growth_Manager, Mes, Ordenes, Ventas, NPS, Ordenes_Canceladas, Disponibilidad, Conversion, Recompra, Clientes_Nuevos, Clientes_Recurrentes)
+
+Umbrales de Pimentón:
+- NPS < 4.2 = crítico, 4.2-4.4 = atención, > 4.4 = ok
+- Cancelaciones > 4% = crítico, 2.5-4% = atención
+- Disponibilidad < 90% = crítico, 90-95% = atención
+- Conversión < 10% = crítico, 10-14% = atención
+
+Genera un diagnóstico de 8-15 clientes (marcas únicas, con sucursales agregadas o la peor sucursal).
+
+Responde SOLO JSON:
+{
+  "resumen": {"total":N,"criticos":N,"atencion":N,"excelentes":N,"score_promedio":N},
+  "clientes": [
+    {
+      "marca": "nombre",
+      "sucursal": "nombre o 'Red completa'",
+      "gm": "nombre del GM",
+      "pais": "país",
+      "score": N (0-100),
+      "status": "ok|warn|alert",
+      "items": [
+        {"tipo":"ok|bad|warn|rec","texto":"descripción concreta con números"},
+        {"tipo":"ok|bad|warn|rec","texto":"otro item"}
+      ]
+    }
+  ]
+}`;
+
+  try {
+    const res = await fetch('/api/claude', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:4000, messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    let txt = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    txt = txt.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const d = JSON.parse(txt);
+    renderDiagnostico(d);
+  } catch(e) {
+    document.getElementById('diag-loading').style.display = 'none';
+    document.getElementById('diag-list').innerHTML = `<div style="padding:20px;color:var(--danger);font-size:12px;">Error: ${e.message}</div>`;
+  }
+}
+
+function renderDiagnostico(d) {
+  document.getElementById('diag-loading').style.display = 'none';
+  const r = d.resumen;
+  document.getElementById('diag-kpis').innerHTML = `
+    <div class="stat"><div class="stat-l">Clientes analizados</div><div class="stat-v">${r.total}</div><div class="stat-d nt">Todos los activos</div></div>
+    <div class="stat"><div class="stat-l">Score promedio</div><div class="stat-v" style="color:${r.score_promedio<60?'var(--danger)':r.score_promedio<75?'var(--amber)':'var(--green)'}">${r.score_promedio}</div><div class="stat-d nt">0–100</div></div>
+    <div class="stat"><div class="stat-l">Zona crítica</div><div class="stat-v" style="color:var(--danger)">${r.criticos}</div><div class="stat-d dn">Score &lt; 60</div></div>
+    <div class="stat"><div class="stat-l">Excelentes</div><div class="stat-v" style="color:var(--green)">${r.excelentes}</div><div class="stat-d up">Score &gt; 80</div></div>`;
+
+  const scoreColor = s => s>=80?'var(--green)':s>=60?'var(--amber)':'var(--danger)';
+  const itemClass  = t => ({ok:'ok',bad:'bad',warn:'warn',rec:'rec'}[t]||'ok');
+
+  document.getElementById('diag-list').innerHTML = (d.clientes||[])
+    .sort((a,b)=>a.score-b.score)
+    .map(c=>`
+      <div class="diag-card">
+        <div class="diag-card-hdr">
+          <div>
+            <div style="font-weight:700;font-size:13px">${c.marca} <span style="font-weight:400;color:var(--inkf);font-size:11px">— ${c.sucursal}</span></div>
+            <div style="font-size:10px;color:var(--inkf);margin-top:1px">${c.gm} · ${c.pais}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="diag-score-bar"><div class="diag-score-fill" style="width:${c.score}%;background:${scoreColor(c.score)}"></div></div>
+            <div style="font-weight:800;font-size:14px;color:${scoreColor(c.score)}">${c.score}/100</div>
+          </div>
+        </div>
+        <div class="diag-card-body">
+          ${(c.items||[]).map(item=>`<div class="diag-item ${itemClass(item.tipo)}">${item.tipo==='rec'?'💡 ':item.tipo==='bad'?'✗ ':item.tipo==='warn'?'⚠ ':'✓ '}${item.texto}</div>`).join('')}
+        </div>
+      </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+
+
+
+
+// ══════════════════════════════════════════════
+// LOGIN — definido al final, después de go() y todo el DOM
+// ══════════════════════════════════════════════
+var USERS = {
+  'kevin@pimenton.io':    {pass:'pimenton2026', name:'Kevin Ostrovsky',   role:'Country Manager',   region:'USA/CAN/RD', initials:'KO', access:'cm'},
+  'franco@pimenton.io':   {pass:'pimenton2026', name:'Franco DiFabio',    role:'Growth Manager Sr', region:'USA',        initials:'FD', access:'gm'},
+  'daniel@pimenton.io':   {pass:'pimenton2026', name:'Daniel Moran',      role:'Growth Manager Sr', region:'USA',        initials:'DM', access:'gm'},
+  'daniella@pimenton.io': {pass:'pimenton2026', name:'Daniella Bayona',   role:'Growth Manager',    region:'USA',        initials:'DB', access:'gm'},
+  'nacho@pimenton.io':    {pass:'pimenton2026', name:'Nacho Aranciaga',   role:'Founder',           region:'Global',     initials:'NA', access:'founder'},
+  'gabriel@pimenton.io':  {pass:'pimenton2026', name:'Gabriel Chaylle',   role:'Country Manager',   region:'CHARUY',     initials:'GC', access:'cm'},
+  'andres@pimenton.io':   {pass:'pimenton2026', name:'Andres Tolosa',     role:'Country Manager',   region:'MECOPE',     initials:'AT', access:'cm'},
+  'belen@pimenton.io':    {pass:'pimenton2026', name:'Belen Benavidez',   role:'Finance',           region:'Global',     initials:'BB', access:'finance'},
+  'tomas@pimenton.io':    {pass:'pimenton2026', name:'Tomas Pereyra',     role:'Founder',           region:'Global',     initials:'TP', access:'founder'},
+  'juanchi@pimenton.io':  {pass:'pimenton2026', name:'Juanchi',           role:'Founder',           region:'Global',     initials:'JU', access:'founder'},
+  'mateo@pimenton.io':    {pass:'pimenton2026', name:'Mateo Garcia',      role:'Data / BI',         region:'Global',     initials:'MG', access:'gm'},
+  'nicolas@pimenton.io':  {pass:'pimenton2026', name:'Nicolas Lopez',     role:'Growth Manager Sr', region:'MECOPE',     initials:'NL', access:'gm'}
+};
+
+function doLogin() {
+  var emailEl = document.getElementById('li-email');
+  var passEl  = document.getElementById('li-pass');
+  var errEl   = document.getElementById('li-err');
+  if (!emailEl || !passEl || !errEl) { alert('Error: formulario no encontrado'); return; }
+
+  var email = emailEl.value.trim().toLowerCase();
+  var pass  = passEl.value;
+  var u     = USERS[email];
+
+  if (!u || u.pass !== pass) {
+    errEl.textContent = 'Email o contrasena incorrectos.';
+    passEl.style.borderColor = '#C42E1A';
+    return;
+  }
+
+  // Sidebar
+  var sbUn = document.querySelector('.sb-un');
+  var sbUr = document.querySelector('.sb-ur');
+  var sbAv = document.querySelector('.sb-av');
+  if (sbUn) sbUn.textContent = u.name;
+  if (sbUr) sbUr.textContent = u.role + ' · ' + u.region;
+  if (sbAv) sbAv.textContent = u.initials;
+
+  // Roles
+  var isFounder = u.access === 'founder';
+  var isCM      = u.access === 'cm' || isFounder;
+  var isFinance = u.access === 'finance';
+  document.querySelectorAll('.sb-role').forEach(function(tag) {
+    var li = tag.closest('.sb-a');
+    if (!li) return;
+    var role = tag.textContent.trim();
+    if      (role === 'FOUNDER') li.style.display = isFounder ? 'flex' : 'none';
+    else if (role === 'CM')      li.style.display = isCM      ? 'flex' : 'none';
+    else if (role === 'ADMIN')   li.style.display = (isFounder || isFinance) ? 'flex' : 'none';
+  });
+
+  // Show app
+  var ls = document.getElementById('login-screen');
+  var ap = document.getElementById('app');
+  if (ls) ls.style.display = 'none';
+  if (ap) ap.style.display = 'flex';
+
+  // Navigate — go() is already defined above
+  var firstNav = document.querySelector('.sb-a');
+  if (firstNav) firstNav.classList.add('on');
+  go(firstNav, 'dashboard');
+}
+
+// Wire events — DOM is fully loaded since this script is at end of body
+var _lb  = document.getElementById('login-btn');
+var _lei = document.getElementById('li-email');
+var _lpi = document.getElementById('li-pass');
+if (_lb)  _lb.addEventListener('click', doLogin);
+if (_lei) _lei.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+if (_lpi) _lpi.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+
+</script>
+</body>
+</html>
